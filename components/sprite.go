@@ -1,7 +1,6 @@
-package entities
+package components
 
 import (
-	"image"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -34,42 +33,34 @@ func (s *AnimatedSprite) UpdateVelocity(x, y float64) {
 
 // animated 2d sprite
 type AnimatedSprite struct {
-	animations map[string]*Animation
-	current    string
+	Animations [][]*Animation
+	Current    int
+	Direction  int
 	X, Y       float64
 }
 
-func (as *AnimatedSprite) AddAnimation(spritesheet []*ebiten.Image, key string, speed float64) {
-	as.animations[key] = &Animation{
-		Frames:            spritesheet,
-		CurrentFrameIndex: 0,
-		Advance:           0,
-		AnimationSpeed:    speed,
-	}
-}
-
-func (as *AnimatedSprite) CurrentFrame() *ebiten.Image {
-	a := as.animations[as.current]
-	return a.Draw()
+func (as *AnimatedSprite) AddAnimation(spritesheet *ebiten.Image, anim int, speed float64) {
+	as.Animations[anim] = append(as.Animations[anim], &Animation{
+		Frames:         spritesheet,
+		Index:          0,
+		Advance:        0,
+		AnimationSpeed: speed,
+		w:              64,
+		h:              64,
+		FrameCount:     spritesheet.Bounds().Dx() / 64,
+	})
 }
 
 func (as *AnimatedSprite) CurrentAnimation() *Animation {
-	anim := as.animations[as.current]
-	return anim
+	a := as.Animations[as.Current][as.Direction]
+	return a
 }
 
 // helper methods for working with sprites
-func LoadSpriteSheet(path string, w, h int) []*ebiten.Image {
-	frames := []*ebiten.Image{}
+func LoadSpriteSheet(path string, w, h int) *ebiten.Image {
 	img, _, err := ebitenutil.NewImageFromFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	n := img.Bounds().Dx() / w
-	for i := range n {
-		dimensions := image.Rect(i*w, 0, (i+1)*w, h)
-		frame := img.SubImage(dimensions).(*ebiten.Image)
-		frames = append(frames, frame)
-	}
-	return frames
+	return img
 }

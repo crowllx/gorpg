@@ -2,10 +2,10 @@ package main
 
 import (
 	"gorpg/entities"
-	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"golang.org/x/image/colornames"
 )
 
 type Game struct {
@@ -30,10 +30,10 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{120, 100, 255, 255})
+	screen.Fill(colornames.Darkslateblue)
 	opts := ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(g.player.X, g.player.Y)
-	screen.DrawImage(g.player.CurrentFrame(), &opts)
+	screen.DrawImage(g.player.CurrentAnimation().Draw(), &opts)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHieght int) (screenWdith, screenHeight int) {
@@ -45,6 +45,7 @@ func main() {
 	ebiten.SetWindowTitle("gorpg")
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	player := entities.New()
+
 	if err := ebiten.RunGame(&Game{player: player}); err != nil {
 		log.Fatal(err)
 	}
