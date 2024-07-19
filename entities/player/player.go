@@ -7,6 +7,7 @@ import (
 
 	"github.com/looplab/fsm"
 	input "github.com/quasilyte/ebitengine-input"
+	"github.com/solarlune/resolv"
 )
 
 type direction int
@@ -33,9 +34,10 @@ type Player struct {
 	input        *input.Handler
 	stateMachine *fsm.FSM
 	speed        int
+	collider     *resolv.Object
 }
 
-func NewPlayer() *Player {
+func NewPlayer(space *resolv.Space) *Player {
 	prefix := "assets/images/pixelarium-character/"
 	var animations [][]*Animation
 	animations = append(animations, []*Animation{})
@@ -43,9 +45,7 @@ func NewPlayer() *Player {
 	animations = append(animations, []*Animation{})
 	animations = append(animations, []*Animation{})
 
-	player := Player{sprite: &AnimatedSprite{
-		Animations: animations,
-	}}
+	player := Player{sprite: NewAS(animations)}
 	player.NewStateMachine()
 	player.speed = 1
 	player.Movement = &Movement{
@@ -54,6 +54,9 @@ func NewPlayer() *Player {
 		Dir:      Direction{X: 0, Y: 0},
 		Cardinal: RIGHT,
 	}
+	player.collider = resolv.NewObject(100, 100, 64, 64)
+	player.collider.SetShape(resolv.NewCircle(100, 100, 16))
+	space.Add(player.collider)
 
 	// back
 	frames := LoadSpriteSheet(prefix+"back-animations/spr_player_back_attack.png", 64, 64)
@@ -148,8 +151,21 @@ func (p *Player) Update() {
 	if p.stateMachine.Is("attack") {
 		dir.X, dir.Y = 0, 0
 	}
-	p.X += float64(dir.X * p.speed)
-	p.Y += float64(dir.Y * p.speed)
+	dx := float64(dir.X * p.speed)
+	dy := float64(dir.Y * p.speed)
+	if check := p.collider.Check(0, dy, "solid"); check != nil {
+		fmt.Println("collision")
+		dy = 0
+	}
+	if check := p.collider.Check(dx, 0, "solid"); check != nil {
+		fmt.Println("collision")
+		dx = check.ContactWithObject(check.Objects[0]).X
+	}
+
+	p.X += dx
+	p.collider.Position.X += dx
+	p.Y += dy
+	p.collider.Position.Y += dy
 
 	p.sprite.CurrentImg.Update()
 	if p.sprite.CurrentImg.Done() {

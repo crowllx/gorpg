@@ -23,20 +23,25 @@ func (s *Sprite2D) Draw(screen *ebiten.Image) *ebiten.Image {
 
 // animated 2d sprite
 type AnimatedSprite struct {
-	Animations [][]*Animation
+	animations [][]*Animation
 	CurrentImg *Animation
 	Current    int
 	// Cardinal   int
 	// X, Y       float64
 }
 
+func NewAS(anims [][]*Animation) *AnimatedSprite {
+	return &AnimatedSprite{
+		animations: anims,
+	}
+}
 func (as *AnimatedSprite) ChangeAnimation(anim int, cardinal int) {
 	as.Current = anim
-	as.CurrentImg = as.Animations[anim][cardinal]
+	as.CurrentImg = as.animations[anim][cardinal]
 }
 
 func (as *AnimatedSprite) AddAnimation(spritesheet *ebiten.Image, anim int, speed float64, w, h int, loop bool) {
-	as.Animations[anim] = append(as.Animations[anim], &Animation{
+	as.animations[anim] = append(as.animations[anim], &Animation{
 		Frames:         spritesheet,
 		Index:          0,
 		Advance:        0,
@@ -50,7 +55,7 @@ func (as *AnimatedSprite) AddAnimation(spritesheet *ebiten.Image, anim int, spee
 }
 
 func (as *AnimatedSprite) CurrentAnimation(cardinal int) *Animation {
-	a := as.Animations[as.Current][cardinal]
+	a := as.animations[as.Current][cardinal]
 	return a
 }
 
