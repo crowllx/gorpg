@@ -145,9 +145,12 @@ func (p *Player) Update() {
 	if p.input.ActionIsJustPressed(ActionAttack) {
 		p.stateMachine.Event(context.Background(), "attack")
 	}
-
+	if p.stateMachine.Is("attack") {
+		dir.X, dir.Y = 0, 0
+	}
 	p.X += float64(dir.X * p.speed)
 	p.Y += float64(dir.Y * p.speed)
+
 	p.sprite.CurrentImg.Update()
 	if p.sprite.CurrentImg.Done() {
 		fmt.Println("hello")
