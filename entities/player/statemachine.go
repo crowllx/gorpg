@@ -1,0 +1,40 @@
+package player
+
+import (
+	"context"
+
+	"github.com/looplab/fsm"
+)
+
+func (p *Player) NewStateMachine() {
+	sm := fsm.NewFSM("idle",
+		fsm.Events{
+			{Name: "idle", Src: []string{"walk"}, Dst: "idle"},
+			{Name: "walk", Src: []string{"idle"}, Dst: "walk"},
+			{Name: "attack", Src: []string{"idle", "walk"}, Dst: "attack"},
+			{Name: "attack-end", Src: []string{"attack"}, Dst: "idle"},
+		},
+		fsm.Callbacks{
+			"enter_state": func(_ context.Context, e *fsm.Event) { p.enterState(e) },
+		},
+	)
+	p.stateMachine = sm
+	p.stateMachine.SetState("idle")
+}
+
+func (p *Player) enterIdle() {
+	p.sprite.Current = IDLE
+}
+
+func (p *Player) enterWalk() {
+	p.sprite.Current = WALK
+}
+
+// TODO
+func enterAttack() {
+
+}
+
+func enterDodge() {
+
+}

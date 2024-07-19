@@ -15,6 +15,8 @@ type Animation struct {
 	FrameCount     int
 	w              int
 	h              int
+	loop           bool
+	finished       bool
 }
 
 func (a *Animation) Update() {
@@ -22,7 +24,11 @@ func (a *Animation) Update() {
 	a.Index = int(math.Floor(a.Advance))
 
 	if a.Index >= a.FrameCount {
-		a.Reset()
+		if a.loop {
+			a.Reset()
+		} else {
+			a.finished = true
+		}
 	}
 }
 func (a *Animation) Draw() *ebiten.Image {
@@ -31,7 +37,12 @@ func (a *Animation) Draw() *ebiten.Image {
 	return a.Frames.SubImage(dimensions).(*ebiten.Image)
 }
 
+func (a *Animation) Done() bool {
+	return a.finished
+}
+
 func (a *Animation) Reset() {
 	a.Index = 0
 	a.Advance = 0
+	a.finished = false
 }
