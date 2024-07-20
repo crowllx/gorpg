@@ -34,7 +34,8 @@ type Player struct {
 	input        *input.Handler
 	stateMachine *fsm.FSM
 	speed        int
-	collider     *resolv.Object
+	collider     *Collider
+	hurtboxes    []*HurtBox
 }
 
 func NewPlayer(space *resolv.Space) *Player {
@@ -54,10 +55,9 @@ func NewPlayer(space *resolv.Space) *Player {
 		Dir:      Direction{X: 0, Y: 0},
 		Cardinal: RIGHT,
 	}
-	player.collider = resolv.NewObject(100, 100, 64, 64)
-	player.collider.SetShape(resolv.NewCircle(100, 100, 16))
-	space.Add(player.collider)
-
+	player.collider = (NewCollider(100, 100, 16, 16, "solid", "hit"))
+	(*resolv.Object)(player.collider).SetCenter(132, 132)
+	space.Add((*resolv.Object)(player.collider))
 	// back
 	frames := LoadSpriteSheet(prefix+"back-animations/spr_player_back_attack.png", 64, 64)
 	player.sprite.AddAnimation(frames, ATTACK, .2, 64, 64, false)
@@ -98,6 +98,14 @@ func NewPlayer(space *resolv.Space) *Player {
 	player.sprite.AddAnimation(frames, WALK, .2, 64, 64, true)
 
 	player.sprite.ChangeAnimation(IDLE, RIGHT)
+	hb := NewHurtBox(player.X, player.Y, 24, 24)
+	hb.Position.X = player.X + 32
+	hb.Position.Y = player.Y + 24
+	hb.AddToIgnoreList((*resolv.Object)(player.collider))
+	(*resolv.Object)(player.collider).AddToIgnoreList(hb.Object)
+	fmt.Printf("%+v", hb.Center())
+	space.Add(hb.Object)
+	player.hurtboxes = append(player.hurtboxes, hb)
 	return &player
 }
 func (p *Player) AddInputHandler(s *input.System) {
@@ -121,7 +129,7 @@ func (p *Player) enterState(e *fsm.Event) {
 	case "walk":
 		p.sprite.ChangeAnimation(WALK, p.Cardinal)
 	case "attack":
-		p.sprite.ChangeAnimation(ATTACK, p.Cardinal)
+		p.enterAttack()
 	case "attack-end":
 		p.sprite.ChangeAnimation(IDLE, p.Cardinal)
 	}
@@ -153,23 +161,19 @@ func (p *Player) Update() {
 	}
 	dx := float64(dir.X * p.speed)
 	dy := float64(dir.Y * p.speed)
-	if check := p.collider.Check(0, dy, "solid"); check != nil {
-		fmt.Println("collision")
-		dy = 0
-	}
-	if check := p.collider.Check(dx, 0, "solid"); check != nil {
-		fmt.Println("collision")
-		dx = check.ContactWithObject(check.Objects[0]).X
-	}
-
+	dx, dy, _ = p.collider.Check(dx, dy)
 	p.X += dx
 	p.collider.Position.X += dx
 	p.Y += dy
 	p.collider.Position.Y += dy
+	p.hurtboxes[0].Position.X += dx
+	p.hurtboxes[0].Position.Y += dy
+	if col := p.hurtboxes[0].Check(dx, dy, "hurt"); col != nil {
+		fmt.Print("i hit something")
+	}
 
 	p.sprite.CurrentImg.Update()
 	if p.sprite.CurrentImg.Done() {
-		fmt.Println("hello")
 		p.stateMachine.Event(context.Background(), "attack-end")
 	}
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type Drawable interface {
-	Draw(screen *ebiten.Image)
+	Draw(screen *ebiten.Image) *ebiten.Image
 }
 
 // static 2d sprite
@@ -18,6 +18,9 @@ type Sprite2D struct {
 }
 
 func (s *Sprite2D) Draw(screen *ebiten.Image) *ebiten.Image {
+	opts := ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(s.X, s.Y)
+	screen.DrawImage(s.Sprite, &opts)
 	return s.Sprite
 }
 
