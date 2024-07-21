@@ -30,7 +30,7 @@ func NewGame() *Game {
 	g.player.AddInputHandler(&g.inputSystem)
 	g.Height = gh
 	g.Width = gw
-	g.scene = (*scenes.Scene)(scenes.NewDebugScene(int(g.Width), int(g.Height), 16, 16, g.player))
+	g.scene = (*scenes.Scene)(scenes.NewDebugScene(g.Width, g.Height, 16, 16, g.player))
 	return g
 }
 func (g *Game) Update() error {

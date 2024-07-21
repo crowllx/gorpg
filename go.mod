@@ -4,6 +4,7 @@ go 1.22.2
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.7.7
+	github.com/jakecoffman/cp/v2 v2.0.2
 	github.com/looplab/fsm v1.0.2
 	github.com/quasilyte/ebitengine-input v0.9.1
 	github.com/solarlune/resolv v0.7.0

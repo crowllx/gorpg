@@ -1,35 +1,45 @@
 package scenes
 
 import (
-	enemies "gorpg/entities/enemies/blueslime"
+	// enemies "gorpg/entities/enemies/blueslime"
+	"fmt"
 	"gorpg/entities/player"
 
-	"github.com/solarlune/resolv"
+	"github.com/jakecoffman/cp/v2"
 )
 
 type DebugScene Scene
 
-func NewDebugScene(w, h, cw, ch int, player *player.Player) *DebugScene {
+func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene {
 	s := DebugScene{}
 	s.debug = true
-	space := resolv.NewSpace(w, h, cw, ch)
-	s.space = space
+	s.space = cp.NewSpace()
+	s.space.Iterations = 1
+	fmt.Printf("%d %d %d %D", w, h, cw, ch)
 	s.player = player
-	player.AddToSpace(s.space)
+	s.player.AddSpace(s.space)
+	s.space.EachShape(func(shape *cp.Shape) {
+		fmt.Printf("%v\n", shape.BB().Center())
+	})
 
-	enemy := enemies.NewSlime()
-	s.enemies = append(s.enemies, enemy)
-	enemy.AddToSpace(s.space)
-
-	// add walls
-	s.space.Add(
-		resolv.NewObject(0, 0, 640, 16, "solid"),
-		resolv.NewObject(0, 360-16, 640, 16, "solid"),
-		resolv.NewObject(0, 16, 16, 360-32, "solid"),
-		resolv.NewObject(640-16, 16, 16, 360-32, "solid"),
-	)
-	for _, o := range s.space.Objects() {
-		o.SetShape(resolv.NewRectangle(o.Position.X, o.Position.Y, o.Size.X, o.Size.Y))
+	// dont think the walls 'bodies' are being added to space, but collision is working
+	walls := []*cp.Shape{
+		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 0, Y: 0}, cp.Vector{X: w, Y: 0}, 1),
+		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 0, Y: 0}, cp.Vector{X: 0, Y: h}, 1),
+		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: w, Y: 0}, cp.Vector{X: w, Y: h}, 1),
+		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 0, Y: h}, cp.Vector{X: w, Y: h}, 1),
 	}
+	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_STATIC)))
+
+	for _, w := range walls {
+		s.space.AddShape(w)
+	}
+	// s.space.AddShape(shape)
+	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_KINEMATIC)))
+
+	// enemy := enemies.NewSlime()
+	// s.enemies = append(s.enemies, enemy)
+	// enemy.AddToSpace(s.space)
+
 	return &s
 }
