@@ -5,35 +5,49 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/solarlune/resolv"
-	"golang.org/x/image/colornames"
 )
 
-type Enemy struct {
-	sprite   *Sprite2D
-	collider *Collider
+type Enemy interface {
+	Draw(*ebiten.Image)
+	AddToSpace(*resolv.Space)
+	Update()
+	Death()
+	Query(string) (int, error)
+}
+type BaseEnemy struct {
+	*resolv.Object
+	Sprite *AnimatedSprite
+	Status *Status
 }
 
-func NewEnemy(space *resolv.Space) *Enemy {
-	img := ebiten.NewImage(64, 64)
-	img.Fill(colornames.Black)
-	e := &Enemy{
-		sprite: &Sprite2D{
-			Sprite: img,
-			X:      250,
-			Y:      250,
-		},
-		collider: NewCollider(250, 250, 64, 64, "hit", "solid"),
-	}
-	space.Add((*resolv.Object)(e.collider))
+func New() *BaseEnemy {
+	e := &BaseEnemy{}
+	e.Object = resolv.NewObject(250, 250, 64, 64, "solid", "hit")
+	e.Status = NewStatus(10, 0, e.Death)
+	e.Data = e
 	return e
 }
-func (e *Enemy) Collider() *resolv.Object {
-	return (*resolv.Object)(e.collider)
-}
-func (e *Enemy) Sprite() *Sprite2D {
-	return e.sprite
+
+func (e *BaseEnemy) AddToSpace(space *resolv.Space) {
+	space.Add(e.Object)
 }
 
-func (e *Enemy) Update() {
-	e.collider.Check(0, 0)
+func (e *BaseEnemy) Draw(screen *ebiten.Image) {
+	opts := ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(e.Position.X, e.Position.Y)
+	screen.DrawImage(e.Sprite.CurrentImg.Draw(), &opts)
+}
+func (e *BaseEnemy) Death() {
+	if space := e.Object.Space; space != nil {
+		space.Remove(e.Object)
+	}
+	e = nil
+}
+func (e *BaseEnemy) Query(q string) (int, error) {
+	return e.Status.Query(q)
+}
+
+// TODO: what is needed to update an 'enemy'?
+func (e *BaseEnemy) Update() {
+	e.Check(0, 0)
 }
