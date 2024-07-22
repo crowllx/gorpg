@@ -20,6 +20,9 @@ function that will run callback when ever something appropriate enters it's rang
 as well in order to generate areas with different collision filters
 ```go
 
+// possibly area could instead be a interface that requires the implementation of 
+// an update method
+
 type Struct Area {
     maxDistance float64
     shape *cp.Shape

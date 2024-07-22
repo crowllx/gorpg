@@ -30,7 +30,7 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: w, Y: 0}, cp.Vector{X: w, Y: h}, 1),
 		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 0, Y: h}, cp.Vector{X: w, Y: h}, 1),
 	}
-	walls = append(walls, cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 200, Y: 0}, cp.Vector{X: 200, Y: 360}, 1))
+	walls = append(walls, cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 200, Y: 0}, cp.Vector{X: 200, Y: 180}, 1))
 
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_STATIC)))
 
@@ -43,6 +43,9 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 		s.space.AddShape(w)
 	}
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_KINEMATIC)))
+	s.space.EachShape(func(shape *cp.Shape) {
+		fmt.Printf("%T\n", shape.Class)
+	})
 	setupCollisionHandlers(s.space)
 
 	// enemy := enemies.NewSlime()

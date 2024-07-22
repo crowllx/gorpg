@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	. "gorpg/components"
+	"gorpg/utils"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -43,6 +44,7 @@ type Player struct {
 	hurtboxes    []*HurtBox
 	Status       *Status
 	cardinal     int
+	area         *utils.BasicArea
 }
 
 func New() *Player {

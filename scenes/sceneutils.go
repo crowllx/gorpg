@@ -65,18 +65,22 @@ func (s *Scene) Update() {
 }
 
 func (s *Scene) debugCollisions(screen *ebiten.Image) {
-	s.space.EachBody(func(body *cp.Body) {
-		body.EachShape(func(shape *cp.Shape) {
-			switch shape.Class.(type) {
-			case *cp.Circle:
-				// fmt.Printf("shape center %v\n", shape.BB().Center())
-				var color colorm.ColorM
-				color.Scale(1, 1, 1, .2)
-				pos := shape.BB().Center()
-				vector.DrawFilledCircle(screen, float32(pos.X), float32(pos.Y), 16.0, color.Apply(colornames.Crimson), false)
-			default:
-			}
-		})
+	s.space.EachShape(func(shape *cp.Shape) {
+		switch shape.Class.(type) {
+		case *cp.Circle:
+			// fmt.Printf("shape center %v\n", shape.BB().Center())
+			var color colorm.ColorM
+			color.Scale(1, 1, 1, .2)
+			pos := shape.BB().Center()
+			vector.DrawFilledCircle(screen, float32(pos.X), float32(pos.Y), 16.0, color.Apply(colornames.Crimson), false)
+		case *cp.Segment:
+			var color colorm.ColorM
+			color.Scale(1, 1, 1, .2)
+			v1 := shape.Class.(*cp.Segment).A()
+			v2 := shape.Class.(*cp.Segment).B()
+			vector.StrokeLine(screen, float32(v1.X), float32(v1.Y), float32(v2.X), float32(v2.Y), 4, color.Apply(colornames.Black), false)
+		default:
+		}
 	})
 }
 
