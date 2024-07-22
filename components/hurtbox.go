@@ -7,18 +7,21 @@ import (
 )
 
 type HurtBox struct {
-	shape *cp.Shape
+	Shape *cp.Shape
 }
+
+const HURTBOX = 4
 
 func NewHurtBox(rad float64, space *cp.Space, body *cp.Body, offset *cp.Vector) *HurtBox {
 	obj := HurtBox{
-		shape: cp.NewCircle(body, 16, *offset),
+		Shape: cp.NewCircle(body, 16, *offset),
 	}
-	space.AddShape(obj.shape)
-	filter := cp.NewShapeFilter(1, 1, 0)
-	obj.shape.SetFilter(filter)
-
-	fmt.Printf("bod %v\nbox %v", obj.shape.Body().Position(), obj.shape.BB().Center())
+	space.AddShape(obj.Shape)
+	filter := cp.NewShapeFilter(0, HURTBOX, 0b00001000)
+	obj.Shape.SetFilter(filter)
+	obj.Shape.SetCollisionType(HURTBOX)
+	obj.Shape.UserData = obj
+	fmt.Printf("bod %v\nbox %v", obj.Shape.Body().Position(), obj.Shape.BB().Center())
 	return &obj
 }
 

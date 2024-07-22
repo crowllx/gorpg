@@ -2,7 +2,8 @@ package enemies
 
 import (
 	"gorpg/components"
-	"gorpg/entities/enemies"
+
+	"github.com/jakecoffman/cp/v2"
 )
 
 const (
@@ -14,19 +15,27 @@ const (
 )
 
 type BlueSlime struct {
-	*enemies.BaseEnemy
+	*BaseEnemy
 }
 
-func NewSlime() *BlueSlime {
+// TODO: statemachine/ai logic & hurtboxes
+func NewSlime(pos cp.Vector) *BlueSlime {
 	e := load()
+	e.body = cp.NewKinematicBody()
+	e.body.SetPosition(pos)
+	e.shape = cp.NewCircle(e.body, 16, cp.Vector{X: 0, Y: 0})
+	filter := cp.NewShapeFilter(0, uint(0b0001000), uint(0b00001111))
+	e.shape.SetFilter(filter)
+	e.shape.SetCollisionType(3)
+	e.shape.UserData = e
+	e.Status = components.NewStatus(10, 0, e.Death)
+	e.body.UserData = e
 	return e
 }
 
 func load() *BlueSlime {
 	prefix := "assets/images/pixelarium-enemy/slime/blue-slime/spr_Blue_slime_"
-	e := &BlueSlime{
-		enemies.New(),
-	}
+	e := &BlueSlime{&BaseEnemy{}}
 	var animations [][]*components.Animation
 	animations = append(animations, []*components.Animation{})
 	animations = append(animations, []*components.Animation{})

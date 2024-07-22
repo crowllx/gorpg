@@ -1,8 +1,7 @@
 package player
 
 import (
-	. "gorpg/components"
-
+	"github.com/jakecoffman/cp/v2"
 	input "github.com/quasilyte/ebitengine-input"
 )
 
@@ -27,8 +26,8 @@ func GenerateKeyMap() input.Keymap {
 	return keymap
 }
 
-func (p *Player) InputVec() Direction {
-	dir := Direction{X: 0, Y: 0}
+func (p *Player) InputVec() cp.Vector {
+	dir := cp.Vector{X: 0, Y: 0}
 	if p.input.ActionIsPressed(ActionMoveLeft) {
 		dir.X = -1
 	}

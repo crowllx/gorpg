@@ -3,6 +3,7 @@ package scenes
 import (
 	// enemies "gorpg/entities/enemies/blueslime"
 	"fmt"
+	"gorpg/entities/enemies"
 	"gorpg/entities/player"
 
 	"github.com/jakecoffman/cp/v2"
@@ -15,7 +16,7 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 	s.debug = true
 	s.space = cp.NewSpace()
 	s.space.Iterations = 1
-	fmt.Printf("%d %d %d %D", w, h, cw, ch)
+	fmt.Printf("%f %f %d %d", w, h, cw, ch)
 	s.player = player
 	s.player.AddSpace(s.space)
 	s.space.EachShape(func(shape *cp.Shape) {
@@ -29,13 +30,20 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: w, Y: 0}, cp.Vector{X: w, Y: h}, 1),
 		cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 0, Y: h}, cp.Vector{X: w, Y: h}, 1),
 	}
+	walls = append(walls, cp.NewSegment(cp.NewStaticBody(), cp.Vector{X: 200, Y: 0}, cp.Vector{X: 200, Y: 360}, 1))
+
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_STATIC)))
 
+	enemy := enemies.NewSlime(cp.Vector{X: 250, Y: 250})
+	s.enemies = append(s.enemies, enemy)
+	enemy.AddToSpace(s.space)
+	filter := cp.NewShapeFilter(0, 2, uint(0b00000101))
 	for _, w := range walls {
+		w.SetFilter(filter)
 		s.space.AddShape(w)
 	}
-	// s.space.AddShape(shape)
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_KINEMATIC)))
+	setupCollisionHandlers(s.space)
 
 	// enemy := enemies.NewSlime()
 	// s.enemies = append(s.enemies, enemy)

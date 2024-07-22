@@ -1,13 +1,11 @@
 package scenes
 
 import (
-	"fmt"
 	"gorpg/entities/enemies"
 	"gorpg/entities/player"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/jakecoffman/cp/v2"
 	"golang.org/x/image/colornames"
@@ -80,40 +78,6 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 			}
 		})
 	})
-	// debug drawing
-	// for _, o := range s.space.Objects() {
-	// 	if o.Shape != nil {
-	// 		switch o.Shape.(type) {
-	// 		case *resolv.Circle:
-	// 			fmt.Println("winning")
-	// 		case *resolv.ConvexPolygon:
-	// 			pos, size := o.Shape.Bounds()
-	// 			vector.DrawFilledCircle(screen, float32(pos.X), float32(pos.Y), float32(size.X), colornames.Black, false)
-	// 			// opts.ColorScale.ScaleAlpha(.2)
-	// 		}
-	// 	}
-	// 	if o.HasTags("hurt") {
-	// 		pos := o.Position
-	// 		size := o.Size
-	// 		//debug img
-	// 		img := ebiten.NewImage(int(size.X), int(size.Y))
-	// 		img.Fill(colornames.Lightcoral)
-	// 		opts := ebiten.DrawImageOptions{}
-	// 		opts.GeoM.Translate(pos.X, pos.Y)
-	// 		opts.ColorScale.ScaleAlpha(.3)
-	// 		screen.DrawImage(img, &opts)
-	// 	} else if o.HasTags("hit") {
-	// 		pos := o.Position
-	// 		size := o.Size
-	// 		//debug img
-	// 		img := ebiten.NewImage(int(size.X), int(size.Y))
-	// 		img.Fill(colornames.Green)
-	// 		opts := ebiten.DrawImageOptions{}
-	// 		opts.GeoM.Translate(pos.X, pos.Y)
-	// 		opts.ColorScale.ScaleAlpha(.3)
-	// 		screen.DrawImage(img, &opts)
-	// 	}
-	// }
 }
 
 func debug(screen *ebiten.Image, s *Scene) {
@@ -124,10 +88,10 @@ func debug(screen *ebiten.Image, s *Scene) {
 	// 	ehp, _ = s.enemies[0].Query("health")
 	// 	emp, _ = s.enemies[0].Query("mana")
 	// }
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-   pos %v
-   vel %v
-   dir %v`, s.player.Body.Position(), s.player.Body.Velocity(), s.player.Body.Angle()))
+	// ebitenutil.DebugPrint(screen, fmt.Sprintf(`
+	//   player hp: %v mp: %v
+	//   enemy  hp: %v mp: %v
+	//   `, hp, mp, ehp, emp))
 	// osize := s.player.Body
 	// imgb := s.player.Sprite().CurrentImg.Draw().Bounds().Size()
 	// ebitenutil.DebugPrint(screen, fmt.Sprintf(`

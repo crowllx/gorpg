@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/jakecoffman/cp/v2"
 	"github.com/looplab/fsm"
 	input "github.com/quasilyte/ebitengine-input"
@@ -90,8 +91,11 @@ func (p *Player) AddSpace(space *cp.Space) {
 	p.hurtboxes = append(p.hurtboxes, hb)
 	space.AddBody(p.Body)
 	shape := space.AddShape(cp.NewCircle(p.Body, 16, cp.Vector{X: 0, Y: 0}))
-
+	filter := cp.NewShapeFilter(0, 1, uint(0b00001111))
+	shape.SetFilter(filter)
+	shape.SetCollisionType(3)
 	p.shape = shape
+	p.shape.UserData = p
 	space.EachShape(func(s *cp.Shape) {
 		fmt.Printf("%v %v\n", s, s.BB())
 	})
@@ -116,7 +120,7 @@ func (p *Player) enterState(e *fsm.Event) {
 func (p *Player) Update() {
 	dir := p.InputVec()
 	angle := math.Atan2(float64(dir.X), float64(dir.Y*-1))
-	zero := Direction{X: 0, Y: 0}
+	zero := cp.Vector{X: 0, Y: 0}
 	if dir != zero && (p.stateMachine.Can("walk") || p.stateMachine.Current() == "walk") {
 		p.Body.SetAngle(angle)
 		p.stateMachine.Event(context.Background(), "walk")
@@ -168,10 +172,22 @@ func (p *Player) Update() {
 		p.stateMachine.Event(context.Background(), "attack-end")
 		p.attackEnd()
 	}
+
 }
 func (p *Player) Draw(screen *ebiten.Image) {
 	opts := ebiten.DrawImageOptions{}
 	pos := p.Body.Position()
 	opts.GeoM.Translate(pos.X-32, pos.Y-32)
 	screen.DrawImage(p.sprite.CurrentImg.Draw(), &opts)
+
+	//debug
+	// p.shape.Space().BBQuery(p.hurtboxes[0].Shape.BB(), p.hurtboxes[0].Shape.Filter, func(s *cp.Shape, data interface{}) {
+	// 	fmt.Printf("%T", s.UserData)
+	// }, nil)
+	res := p.shape.Space().SegmentQueryFirst(p.shape.BB().Center(), cp.Vector{X: 250, Y: 250}, 1, cp.NewShapeFilter(0, 1, 10))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
+		res: %T
+		point: %v
+		normal: %v
+		user pos: %v`, res.Shape, res.Point, res.Normal, p.Body.Position()))
 }
