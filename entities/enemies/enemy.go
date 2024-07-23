@@ -13,6 +13,7 @@ type Enemy interface {
 	Update()
 	Death()
 	Query(string) (int, error)
+	Modify(string, int)
 }
 type BaseEnemy struct {
 	body      *cp.Body
@@ -42,6 +43,10 @@ func (e *BaseEnemy) Death() {
 }
 func (e *BaseEnemy) Query(q string) (int, error) {
 	return e.Status.Query(q)
+}
+
+func (e *BaseEnemy) Modify(q string, v int) {
+	e.Status.Modify(q, v)
 }
 
 // TODO: what is needed to update an 'enemy'?

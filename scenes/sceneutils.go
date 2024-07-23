@@ -1,11 +1,15 @@
 package scenes
 
 import (
+	"fmt"
+	"gorpg/components"
 	"gorpg/entities/enemies"
 	"gorpg/entities/player"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/jakecoffman/cp/v2"
 	"golang.org/x/image/colornames"
@@ -68,11 +72,22 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 	s.space.EachShape(func(shape *cp.Shape) {
 		switch shape.Class.(type) {
 		case *cp.Circle:
+			var col color.Color
+			switch shape.UserData.(type) {
+			case *components.Detection:
+				var color colorm.ColorM
+				color.Scale(1, 1, 1, .2)
+				col = color.Apply(colornames.Green)
+			default:
+				var color colorm.ColorM
+				color.Scale(1, 1, 1, .2)
+				col = color.Apply(colornames.Crimson)
+				// fmt.Printf("%T\n", shape.UserData)
+			}
 			// fmt.Printf("shape center %v\n", shape.BB().Center())
-			var color colorm.ColorM
-			color.Scale(1, 1, 1, .2)
 			pos := shape.BB().Center()
-			vector.DrawFilledCircle(screen, float32(pos.X), float32(pos.Y), 16.0, color.Apply(colornames.Crimson), false)
+			rad := shape.BB().R - shape.BB().Center().X
+			vector.DrawFilledCircle(screen, float32(pos.X), float32(pos.Y), float32(rad), col, false)
 		case *cp.Segment:
 			var color colorm.ColorM
 			color.Scale(1, 1, 1, .2)
@@ -85,23 +100,15 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 }
 
 func debug(screen *ebiten.Image, s *Scene) {
-	// hp, _ := s.player.Status.Query("health")
-	// mp, _ := s.player.Status.Query("mana")
-	// var ehp, emp int
-	// if len(s.enemies) > 0 {
-	// 	ehp, _ = s.enemies[0].Query("health")
-	// 	emp, _ = s.enemies[0].Query("mana")
-	// }
-	// ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-	//   player hp: %v mp: %v
-	//   enemy  hp: %v mp: %v
-	//   `, hp, mp, ehp, emp))
-	// osize := s.player.Body
-	// imgb := s.player.Sprite().CurrentImg.Draw().Bounds().Size()
-	// ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-	// 	objs: %d
-	// 	player obj pos: %vV
-	// player opbj size: %v
-	// player img bounds: %v
-	// player health: %d mana: %d
+	hp, _ := s.player.Status.Query("health")
+	mp, _ := s.player.Status.Query("mana")
+	var ehp, emp int
+	if len(s.enemies) > 0 {
+		ehp, _ = s.enemies[0].Query("health")
+		emp, _ = s.enemies[0].Query("mana")
+	}
+	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
+	  player hp: %v mp: %v
+	  enemy  hp: %v mp: %v
+	  `, hp, mp, ehp, emp))
 }

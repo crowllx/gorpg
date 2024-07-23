@@ -35,24 +35,13 @@ func (p *Player) enterWalk() {
 // create hurtbox and add to space
 func (p *Player) enterAttack() {
 	p.sprite.ChangeAnimation(ATTACK, p.cardinal)
-	// pos := p.Body.Position()
-	switch 0.0 {
-	case UP:
-	case DOWN:
-		// p.hurtboxes[0].SetCenter(pos.X, pos.Y+20)
-	case LEFT:
-		// p.hurtboxes[0].SetCenter(pos.X-16, pos.Y+4)
-	case RIGHT:
-		// p.hurtboxes[0].SetCenter(pos.X+16, pos.Y+4)
-	}
-	// p.hurtboxes[0].Enable()
-	// fmt.Println(p.hurtboxes[0].Tags())
+	p.hurtboxes[0].Enabled = true
 }
 
 func (p *Player) attackEnd() {
 	p.sprite.ChangeAnimation(IDLE, p.cardinal)
-	// p.hurtboxes[0].Disable()
-	// fmt.Println(p.hurtboxes[0].Tags())
+	p.hurtboxes[0].Enabled = false
+	p.hurtboxes[0].Reset()
 }
 
 func enterDodge() {

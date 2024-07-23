@@ -30,9 +30,10 @@ func (s *Status) Query(q string) (int, error) {
 }
 
 func (s *Status) Modify(query string, value int) (int, error) {
+	fmt.Println("help")
 	switch query {
 	case "health":
-		s.health += value
+		s.health -= value
 		if s.health <= 0 {
 			s.death()
 		}

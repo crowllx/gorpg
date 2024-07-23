@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorpg/entities/enemies"
 	"gorpg/entities/player"
+	"gorpg/utils"
 
 	"github.com/jakecoffman/cp/v2"
 )
@@ -34,7 +35,7 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_STATIC)))
 
-	enemy := enemies.NewSlime(cp.Vector{X: 250, Y: 250})
+	enemy := enemies.NewSlime(cp.Vector{X: 250, Y: 250}, s.space)
 	s.enemies = append(s.enemies, enemy)
 	enemy.AddToSpace(s.space)
 	filter := cp.NewShapeFilter(0, 2, uint(0b00000101))
@@ -46,7 +47,7 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 	s.space.EachShape(func(shape *cp.Shape) {
 		fmt.Printf("%T\n", shape.Class)
 	})
-	setupCollisionHandlers(s.space)
+	utils.SetupCollisionHandlers(s.space)
 
 	// enemy := enemies.NewSlime()
 	// s.enemies = append(s.enemies, enemy)
