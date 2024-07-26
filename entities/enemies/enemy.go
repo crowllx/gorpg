@@ -36,7 +36,9 @@ func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 }
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {
-		space.RemoveShape(e.shape)
+        e.body.EachShape(func(s *cp.Shape) {
+            space.RemoveShape(s)
+        })
 		space.RemoveBody(e.body)
 	}
 	e = nil

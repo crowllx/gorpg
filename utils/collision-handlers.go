@@ -19,7 +19,6 @@ func SetupCollisionHandlers(space *cp.Space) {
 		if !hurt.HitCheck(b) {
 			return false
 		}
-		fmt.Printf("%T", b.UserData)
 		switch b.UserData.(type) {
 		case enemies.Enemy:
 			b.UserData.(enemies.Enemy).Modify("health", hurt.Value())
@@ -36,4 +35,5 @@ func SetupCollisionHandlers(space *cp.Space) {
 	space.NewWildcardCollisionHandler(components.DETECTION_TYPE).PreSolveFunc = wild
 	space.NewCollisionHandler(components.HIT_TYPE, components.PLAYER_TYPE).PreSolveFunc = hitBox
 	space.NewCollisionHandler(components.HIT_TYPE, components.ENEMY_TYPE).PreSolveFunc = hitBox
+
 }

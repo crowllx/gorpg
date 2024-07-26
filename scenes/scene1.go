@@ -3,6 +3,7 @@ package scenes
 import (
 	// enemies "gorpg/entities/enemies/blueslime"
 	"fmt"
+	"gorpg/components"
 	"gorpg/entities/enemies"
 	"gorpg/entities/player"
 	"gorpg/utils"
@@ -41,6 +42,7 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 	filter := cp.NewShapeFilter(0, 2, uint(0b00000101))
 	for _, w := range walls {
 		w.SetFilter(filter)
+        w.SetCollisionType(components.ENVIRONMENT_TYPE)
 		s.space.AddShape(w)
 	}
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_KINEMATIC)))

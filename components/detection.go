@@ -39,6 +39,5 @@ func (l *Detection) Update() {
 		} else {
             l.shape.Body().SetVelocity(0,0)
         }
-		fmt.Printf("%v\n", velocity)
 	}
 }

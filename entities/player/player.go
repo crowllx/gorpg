@@ -47,8 +47,7 @@ type Player struct {
 
 func New() *Player {
 	player := load()
-	body := cp.NewBody(1.0, cp.INFINITY)
-	body.SetType(cp.BODY_DYNAMIC)
+	body := cp.NewBody(3000, cp.INFINITY)
 	body.SetPosition(cp.Vector{X: 100, Y: 100})
 	body.SetVelocity(0, 0)
 	body.UserData = player
@@ -132,6 +131,12 @@ func (p *Player) Update() {
 	}
 	dx := float64(dir.X) * p.speed
 	dy := float64(dir.Y) * p.speed
+    p.Body.EachArbiter(func( arb *cp.Arbiter) {
+        _,b := arb.Shapes()
+        if b.Body().GetType() == cp.BODY_STATIC {
+            fmt.Println("found static body")
+        }
+    })
 	p.Body.SetVelocity(dx, dy)
 
 	p.sprite.CurrentImg.Update()
