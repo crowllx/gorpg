@@ -3,14 +3,29 @@ package utils
 import (
 	"fmt"
 	"gorpg/components"
-	"gorpg/entities/enemies"
-	"gorpg/entities/player"
+	"gorpg/enemies"
+	"gorpg/player"
 
 	"github.com/jakecoffman/cp/v2"
 )
 
+func playerHandler(arb *cp.Arbiter, _ *cp.Space, _ interface{}) bool {
+	_, b := arb.Shapes()
+	switch b.UserData.(type) {
+	case enemies.Enemy:
+		fmt.Printf("%T", b.UserData)
+	case Collidable:
+		fmt.Printf("%T", b.UserData)
+	default:
+	}
+    return false
+}
 func SetupCollisionHandlers(space *cp.Space) {
-	wild := func(_ *cp.Arbiter, _ *cp.Space, _ interface{}) bool {
+	wild := func(arb *cp.Arbiter, _ *cp.Space, _ interface{}) bool {
+		_, b := arb.Shapes()
+		switch b.UserData.(type) {
+		default:
+		}
 		return false
 	}
 	hitBox := func(arb *cp.Arbiter, _ *cp.Space, _ interface{}) bool {

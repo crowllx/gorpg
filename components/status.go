@@ -34,9 +34,6 @@ func (s *Status) Modify(query string, value int) (int, error) {
 	switch query {
 	case "health":
 		s.health -= value
-		if s.health <= 0 {
-			s.death()
-		}
 		return s.health, nil
 	case "mana":
 		if value > s.mana {

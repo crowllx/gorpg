@@ -47,7 +47,7 @@ type Player struct {
 
 func New() *Player {
 	player := load()
-	body := cp.NewBody(3000, cp.INFINITY)
+	body := cp.NewKinematicBody()
 	body.SetPosition(cp.Vector{X: 100, Y: 100})
 	body.SetVelocity(0, 0)
 	body.UserData = player
@@ -73,9 +73,9 @@ func (p *Player) AddSpace(space *cp.Space) {
 	space.AddBody(p.Body)
 	shape := space.AddShape(cp.NewCircle(p.Body, 16, cp.Vector{X: 0, Y: 0}))
 	mask := PLAYER_LAYER | ENVIRONMENT_LAYER | HIT_LAYER |
-		ENEMY_LAYER | DETECTION_LAYER
+		DETECTION_LAYER
 
-	filter := cp.NewShapeFilter(0, 1, mask)
+	filter := cp.NewShapeFilter(0, 3, mask)
 	shape.SetFilter(filter)
 	shape.SetCollisionType(PLAYER_TYPE)
 	p.shape = shape

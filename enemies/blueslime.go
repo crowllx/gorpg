@@ -17,7 +17,6 @@ const (
 
 type BlueSlime struct {
 	*BaseEnemy
-	los *components.Detection
 }
 
 // TODO: statemachine/ai logic & hurtboxes
@@ -26,7 +25,7 @@ func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	e.body = cp.NewKinematicBody()
 	e.body.SetPosition(pos)
 	e.shape = cp.NewCircle(e.body, 16, cp.Vector{X: 0, Y: 0})
-	mask := components.PLAYER_LAYER | components.ENEMY_LAYER |
+	mask := components.ENEMY_LAYER |
 		components.ENVIRONMENT_LAYER | components.HIT_LAYER
 	fmt.Println(mask)
 	filter := cp.NewShapeFilter(0, components.ENEMY_LAYER, mask)
@@ -35,7 +34,8 @@ func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	e.shape.UserData = e
 	e.Status = components.NewStatus(10, 0, e.Death)
 	e.body.UserData = e
-	e.los = components.NewDetection(100, e.body, space, components.PLAYER_LAYER)
+	e.body.AddShape(e.shape)
+	e.aggroRadius = components.NewDetection(100, e.body, space, components.PLAYER_LAYER)
 	return e
 }
 
@@ -61,11 +61,6 @@ func load() *BlueSlime {
 	e.Sprite.AddAnimation(frames, hurt, .2, 64, 64, false)
 	frames = components.LoadSpriteSheet(prefix+"death.png", 64, 64)
 	e.Sprite.AddAnimation(frames, death, .2, 64, 64, false)
-
 	e.Sprite.ChangeAnimation(idle, 0)
 	return e
-}
-
-func (e *BlueSlime) Update() {
-	e.los.Update()
 }

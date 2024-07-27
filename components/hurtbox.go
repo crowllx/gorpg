@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/jakecoffman/cp/v2"
@@ -25,7 +24,6 @@ func NewHurtBox(rad float64, space *cp.Space, body *cp.Body, offset *cp.Vector) 
 	obj.shape.UserData = &obj
 	obj.Enabled = false
 	obj.damage = 2
-	fmt.Printf("bod %v\nbox %v", obj.shape.Body().Position(), obj.shape.BB().Center())
 	return &obj
 }
 func (hb *HurtBox) Value() int {

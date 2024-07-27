@@ -8,6 +8,7 @@ require (
 	github.com/looplab/fsm v1.0.2
 	github.com/quasilyte/ebitengine-input v0.9.1
 	golang.org/x/image v0.18.0
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
 )
 
 require (

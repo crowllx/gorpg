@@ -1,6 +1,7 @@
 package enemies
 
 import (
+	"fmt"
 	. "gorpg/components"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -16,11 +17,12 @@ type Enemy interface {
 	Modify(string, int)
 }
 type BaseEnemy struct {
-	body      *cp.Body
-	shape     *cp.Shape
-	hurtboxes *[]HurtBox
-	Sprite    *AnimatedSprite
-	Status    *Status
+	body        *cp.Body
+	shape       *cp.Shape
+	hurtboxes   *[]HurtBox
+	Sprite      *AnimatedSprite
+	Status      *Status
+	aggroRadius *Detection
 }
 
 func (e *BaseEnemy) AddToSpace(space *cp.Space) {
@@ -36,12 +38,18 @@ func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 }
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {
-        e.body.EachShape(func(s *cp.Shape) {
-            space.RemoveShape(s)
-        })
+		e.body.EachShape(func(s *cp.Shape) {
+			fmt.Printf("%T\n", s.UserData)
+			space.RemoveShape(s)
+		})
 		space.RemoveBody(e.body)
+		space.EachShape(func(s *cp.Shape) {
+			fmt.Printf("space shape %T\n", s.UserData)
+		})
+
 	}
 	e = nil
+
 }
 func (e *BaseEnemy) Query(q string) (int, error) {
 	return e.Status.Query(q)
@@ -54,4 +62,25 @@ func (e *BaseEnemy) Modify(q string, v int) {
 // TODO: what is needed to update an 'enemy'?
 func (e *BaseEnemy) Update() {
 
+	// enemy detection & chase
+	if e.aggroRadius.Enabled {
+		info := e.shape.Space().PointQueryNearest(
+			e.body.Position(),
+			e.aggroRadius.Radius,
+			e.aggroRadius.Shape.Filter,
+		)
+		velocity := info.Point.Sub(e.body.Position()).Normalize().Mult(1)
+		if info.Shape != nil {
+			fmt.Println("yest")
+			e.body.SetVelocityVector(velocity)
+		} else {
+			e.body.SetVelocity(0, 0)
+		}
+	}
+
+	// status queries
+	hp, _ := e.Status.Query("health")
+	if hp <= 0 {
+		e.Death()
+	}
 }

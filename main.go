@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gorpg/entities/player"
+	"gorpg/player"
 	"gorpg/scenes"
 	"log"
 

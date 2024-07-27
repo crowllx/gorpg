@@ -3,8 +3,8 @@ package scenes
 import (
 	"fmt"
 	"gorpg/components"
-	"gorpg/entities/enemies"
-	"gorpg/entities/player"
+	"gorpg/enemies"
+	"gorpg/player"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -58,14 +58,6 @@ func (s *Scene) Update() {
 		default:
 		}
 	})
-	// for _, o := range s.space.Objects() {
-	// 	o.Update()
-	// 	switch o.Data.(type) {
-	// 	case Updateable:
-	// 		o.Data.(Updateable).Update()
-	// 	default:
-	// 	}
-	// }
 }
 
 func (s *Scene) debugCollisions(screen *ebiten.Image) {
