@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	. "gorpg/components"
+	"gorpg/utils"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -75,7 +76,7 @@ func (p *Player) AddSpace(space *cp.Space) {
 	mask := PLAYER_LAYER | ENVIRONMENT_LAYER | HIT_LAYER |
 		DETECTION_LAYER
 
-	filter := cp.NewShapeFilter(0, 3, mask)
+	filter := cp.NewShapeFilter(0, PLAYER_LAYER, mask)
 	shape.SetFilter(filter)
 	shape.SetCollisionType(PLAYER_TYPE)
 	p.shape = shape
@@ -131,13 +132,25 @@ func (p *Player) Update() {
 	}
 	dx := float64(dir.X) * p.speed
 	dy := float64(dir.Y) * p.speed
-    p.Body.EachArbiter(func( arb *cp.Arbiter) {
-        _,b := arb.Shapes()
-        if b.Body().GetType() == cp.BODY_STATIC {
-            fmt.Println("found static body")
-        }
-    })
+
 	p.Body.SetVelocity(dx, dy)
+
+    // TODO move this out into its own movement module that can be resused
+	p.shape.Space().ShapeQuery(p.shape, func(shape *cp.Shape, point *cp.ContactPointSet) {
+		switch shape.UserData.(type) {
+		case utils.Collidable:
+			vel := p.Body.Velocity()
+			n := point.Normal
+			// fmt.Printf("%v\n%v\n", vel, n)
+			if (int(n.X) > 0 && vel.X > 0) || (int(n.X) < 0 && vel.X < 0) {
+				p.shape.Body().SetVelocity(0, p.Body.Velocity().Y)
+			}
+
+			if (int(n.Y) > 0 && vel.Y > 0) || (int(n.Y) < 0 && vel.Y < 0) {
+				p.shape.Body().SetVelocity(p.Body.Velocity().X, 0)
+			}
+		}
+	})
 
 	p.sprite.CurrentImg.Update()
 	if p.stateMachine.Current() == "attack" && p.sprite.CurrentImg.Done() {

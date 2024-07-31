@@ -1,22 +1,26 @@
-package utils
+package scenes 
 
 import (
 	"fmt"
 	"gorpg/components"
 	"gorpg/enemies"
 	"gorpg/player"
-
+    "gorpg/utils"
 	"github.com/jakecoffman/cp/v2"
 )
 
 func playerHandler(arb *cp.Arbiter, _ *cp.Space, _ interface{}) bool {
-	_, b := arb.Shapes()
+	a, b := arb.Shapes()
 	switch b.UserData.(type) {
 	case enemies.Enemy:
-		fmt.Printf("%T", b.UserData)
-	case Collidable:
-		fmt.Printf("%T", b.UserData)
+		// fmt.Printf("%T", b.UserData)
+	case utils.Collidable:
+		// fmt.Printf("%T", b.UserData)
+        p := a.UserData.(*player.Player) 
+        fmt.Println("%T",p)
+    
 	default:
+		fmt.Printf("%T", b.UserData)
 	}
     return false
 }
@@ -50,5 +54,7 @@ func SetupCollisionHandlers(space *cp.Space) {
 	space.NewWildcardCollisionHandler(components.DETECTION_TYPE).PreSolveFunc = wild
 	space.NewCollisionHandler(components.HIT_TYPE, components.PLAYER_TYPE).PreSolveFunc = hitBox
 	space.NewCollisionHandler(components.HIT_TYPE, components.ENEMY_TYPE).PreSolveFunc = hitBox
+    space.NewCollisionHandler(components.PLAYER_TYPE, components.ENVIRONMENT_TYPE).PreSolveFunc = playerHandler
+    
 
 }

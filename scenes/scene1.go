@@ -38,7 +38,7 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 	enemy := enemies.NewSlime(cp.Vector{X: 250, Y: 250}, s.space)
 	s.enemies = append(s.enemies, enemy)
 	enemy.AddToSpace(s.space)
-	filter := cp.NewShapeFilter(0, 3, uint(0b00000101))
+	filter := cp.NewShapeFilter(0, components.ENVIRONMENT_LAYER, components.PLAYER_LAYER | components.ENEMY_LAYER)
 	for _, w := range walls {
 		w.SetFilter(filter)
         w.SetCollisionType(components.ENVIRONMENT_TYPE)
@@ -47,7 +47,8 @@ func NewDebugScene(w, h float64, cw, ch int, player *player.Player) *DebugScene 
 
 	}
 	fmt.Println(len(*s.space.ArrayForBodyType(cp.BODY_KINEMATIC)))
-	utils.SetupCollisionHandlers(s.space)
+	SetupCollisionHandlers(s.space)
+    
 
 	// enemy := enemies.NewSlime()
 	// s.enemies = append(s.enemies, enemy)

@@ -50,7 +50,6 @@ func (s *Scene) Draw(screen *ebiten.Image) {
 }
 
 func (s *Scene) Update() {
-	s.space.Step(1.0)
 	s.space.EachBody(func(body *cp.Body) {
 		switch body.UserData.(type) {
 		case Updateable:
@@ -58,6 +57,7 @@ func (s *Scene) Update() {
 		default:
 		}
 	})
+	s.space.Step(1.0)
 }
 
 func (s *Scene) debugCollisions(screen *ebiten.Image) {
@@ -92,15 +92,14 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 }
 
 func debug(screen *ebiten.Image, s *Scene) {
-	hp, _ := s.player.Status.Query("health")
-	mp, _ := s.player.Status.Query("mana")
-	var ehp, emp int
-	if len(s.enemies) > 0 {
-		ehp, _ = s.enemies[0].Query("health")
-		emp, _ = s.enemies[0].Query("mana")
-	}
+	// hp, _ := s.player.Status.Query("health")
+	// mp, _ := s.player.Status.Query("mana")
+	// var ehp, emp int
+	// if len(s.enemies) > 0 {
+	// 	ehp, _ = s.enemies[0].Query("health")
+	// 	emp, _ = s.enemies[0].Query("mana")
+	// }
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-	  player hp: %v mp: %v
-	  enemy  hp: %v mp: %v
-	  `, hp, mp, ehp, emp))
+	  player vel: %v
+	  `, s.player.Body.Velocity()))
 }
