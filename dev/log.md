@@ -44,3 +44,10 @@ func Update() {
 
 ```
 
+
+## 2024-08-01
+finished wall collisions for the player, starting to implement 
+collision logic for enemies and add a statemachine to have them take actions other
+than chase (...attack, run?).
+
+Also reworking the animatedsprite struct to use a single list of animations instead of nested

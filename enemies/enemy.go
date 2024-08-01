@@ -1,11 +1,14 @@
 package enemies
 
 import (
+	"context"
 	"fmt"
 	. "gorpg/components"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/jakecoffman/cp/v2"
+	"github.com/looplab/fsm"
 )
 
 type Enemy interface {
@@ -17,12 +20,13 @@ type Enemy interface {
 	Modify(string, int)
 }
 type BaseEnemy struct {
-	body        *cp.Body
-	shape       *cp.Shape
-	hurtboxes   *[]HurtBox
-	Sprite      *AnimatedSprite
-	Status      *Status
-	aggroRadius *Detection
+	body         *cp.Body
+	shape        *cp.Shape
+	hurtboxes    *[]HurtBox
+	Sprite       *AnimatedSprite
+	Status       *Status
+	aggroRadius  *Detection
+	stateMachine *fsm.FSM
 }
 
 func (e *BaseEnemy) AddToSpace(space *cp.Space) {
@@ -35,6 +39,10 @@ func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 	pos := e.body.Position()
 	opts.GeoM.Translate(pos.X-32, pos.Y-32)
 	screen.DrawImage(e.Sprite.CurrentImg.Draw(), &opts)
+
+	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
+		enemy state: %s
+		`, e.stateMachine.Current()))
 }
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {
@@ -61,7 +69,7 @@ func (e *BaseEnemy) Modify(q string, v int) {
 
 // TODO: what is needed to update an 'enemy'?
 func (e *BaseEnemy) Update() {
-
+	var velocity cp.Vector
 	// enemy detection & chase
 	if e.aggroRadius.Enabled {
 		info := e.shape.Space().PointQueryNearest(
@@ -69,13 +77,25 @@ func (e *BaseEnemy) Update() {
 			e.aggroRadius.Radius,
 			e.aggroRadius.Shape.Filter,
 		)
-		velocity := info.Point.Sub(e.body.Position()).Normalize().Mult(1)
+
+		//TODO write this ina way that doesn't require nesting
+		var state string
 		if info.Shape != nil {
-			fmt.Println("yest")
-			e.body.SetVelocityVector(velocity)
+			if info.Distance < 8 {
+				velocity = cp.Vector{0, 0}
+				state = "attack"
+			} else {
+				velocity = info.Point.Sub(e.body.Position()).Normalize().Mult(1)
+				state = "chase"
+			}
 		} else {
-			e.body.SetVelocity(0, 0)
+			velocity = cp.Vector{0, 0}
+			state = "idle"
 		}
+		if e.stateMachine.Current() != state {
+			e.stateMachine.Event(context.Background(), state)
+		}
+		e.body.SetVelocityVector(velocity)
 	}
 
 	// status queries

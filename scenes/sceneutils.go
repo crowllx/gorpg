@@ -44,12 +44,13 @@ func (s *Scene) Draw(screen *ebiten.Image) {
 		}
 	})
 	if s.debug {
-		debug(screen, s)
+		// debug(screen, s)
 		s.debugCollisions(screen)
 	}
 }
 
 func (s *Scene) Update() {
+	s.space.Step(1.0)
 	s.space.EachBody(func(body *cp.Body) {
 		switch body.UserData.(type) {
 		case Updateable:
@@ -57,7 +58,6 @@ func (s *Scene) Update() {
 		default:
 		}
 	})
-	s.space.Step(1.0)
 }
 
 func (s *Scene) debugCollisions(screen *ebiten.Image) {

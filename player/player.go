@@ -130,28 +130,32 @@ func (p *Player) Update() {
 	if p.stateMachine.Is("attack") && p.sprite.Current == ATTACK {
 		dir.X, dir.Y = 0, 0
 	}
+
+	// new velocity based on user input
 	dx := float64(dir.X) * p.speed
 	dy := float64(dir.Y) * p.speed
 
-	p.Body.SetVelocity(dx, dy)
-
-    // TODO move this out into its own movement module that can be resused
-	p.shape.Space().ShapeQuery(p.shape, func(shape *cp.Shape, point *cp.ContactPointSet) {
-		switch shape.UserData.(type) {
+	// check collisions given new velocity
+	p.shape.Space().ShapeQuery(p.shape, func(s *cp.Shape, cps *cp.ContactPointSet) {
+		switch s.UserData.(type) {
 		case utils.Collidable:
-			vel := p.Body.Velocity()
-			n := point.Normal
-			// fmt.Printf("%v\n%v\n", vel, n)
-			if (int(n.X) > 0 && vel.X > 0) || (int(n.X) < 0 && vel.X < 0) {
-				p.shape.Body().SetVelocity(0, p.Body.Velocity().Y)
+			fmt.Printf("%T\n", s.UserData)
+			normal := cps.Normal
+			colX, colY := TerrainCheck(cp.Vector{dx, dy}, normal, p.Body)
+			if colX {
+				dx = 0
 			}
-
-			if (int(n.Y) > 0 && vel.Y > 0) || (int(n.Y) < 0 && vel.Y < 0) {
-				p.shape.Body().SetVelocity(p.Body.Velocity().X, 0)
+			if colY {
+				dy = 0
 			}
+		default:
 		}
 	})
 
+	// finally update velocity considering user input and collisions
+	p.Body.SetVelocity(dx, dy)
+
+	// what else needs to be done here? can i abstract this out to different module?
 	p.sprite.CurrentImg.Update()
 	if p.stateMachine.Current() == "attack" && p.sprite.CurrentImg.Done() {
 		p.stateMachine.Event(context.Background(), "attack-end")
