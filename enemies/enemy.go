@@ -80,7 +80,7 @@ func (e *BaseEnemy) Update() {
 
 		//TODO write this ina way that doesn't require nesting
 		var state string
-		if info.Shape != nil {
+		if info.Shape != nil && e.stateMachine.Current() != "attack" {
 			if info.Distance < 8 {
 				velocity = cp.Vector{0, 0}
 				state = "attack"

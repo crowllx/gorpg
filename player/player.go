@@ -98,7 +98,7 @@ func (p *Player) enterState(e *fsm.Event) {
 	case "attack":
 		p.enterAttack()
 	case "attack-end":
-		p.sprite.ChangeAnimation(IDLE, p.cardinal)
+		p.attackEnd()
 	}
 }
 
@@ -159,7 +159,6 @@ func (p *Player) Update() {
 	p.sprite.CurrentImg.Update()
 	if p.stateMachine.Current() == "attack" && p.sprite.CurrentImg.Done() {
 		p.stateMachine.Event(context.Background(), "attack-end")
-		p.attackEnd()
 	}
 }
 

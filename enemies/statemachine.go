@@ -29,7 +29,20 @@ func (e *BaseEnemy) enterState(event *fsm.Event) {
 	case "chase":
 		e.Sprite.ChangeAnimation(walk, 0)
 	case "attack":
-		e.Sprite.ChangeAnimation(attack, 0)
+		e.enterAttack()
+	case "attack-end":
+		e.attackEnd()
 	default:
 	}
+}
+
+func (p *BaseEnemy) enterAttack() {
+	p.Sprite.ChangeAnimation(attack, 0)
+	// p.hurtboxes[0].Enabled = true
+}
+
+func (p *BaseEnemy) attackEnd() {
+	p.Sprite.ChangeAnimation(walk, 0)
+	// p.hurtboxes[0].Enabled = false
+	// p.hurtboxes[0].Reset()
 }
