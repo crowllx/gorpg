@@ -97,7 +97,11 @@ func (e *BaseEnemy) Update() {
 		}
 		e.body.SetVelocityVector(velocity)
 	}
+	e.Sprite.CurrentImg.Update()
+	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentImg.Done() {
+		e.stateMachine.Event(context.Background(), "attack-end")
 
+	}
 	// status queries
 	hp, _ := e.Status.Query("health")
 	if hp <= 0 {

@@ -6,7 +6,7 @@ import (
 	"github.com/looplab/fsm"
 )
 
-func EnemyStateMachine() *fsm.FSM {
+func (enemy *BaseEnemy) EnemyStateMachine() *fsm.FSM {
 	sm := fsm.NewFSM("idle",
 		fsm.Events{
 			{Name: "idle", Src: []string{"chase"}, Dst: "idle"},
@@ -15,12 +15,21 @@ func EnemyStateMachine() *fsm.FSM {
 			{Name: "attack-end", Src: []string{"attack"}, Dst: "chase"},
 		},
 		fsm.Callbacks{
-			"enter_state": func(_ context.Context, e *fsm.Event) { enterState(e) },
+			"enter_state": func(_ context.Context, e *fsm.Event) { enemy.enterState(e) },
 		},
 	)
 	return sm
 }
 
-func enterState(e *fsm.Event) {
-
+func (e *BaseEnemy) enterState(event *fsm.Event) {
+	e.Sprite.CurrentAnimation(0).Reset()
+	switch event.Event {
+	case "idle":
+		e.Sprite.ChangeAnimation(idle, 0)
+	case "chase":
+		e.Sprite.ChangeAnimation(walk, 0)
+	case "attack":
+		e.Sprite.ChangeAnimation(attack, 0)
+	default:
+	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/looplab/fsm"
 )
 
-func (p *Player) NewStateMachine() {
+func (p *Player) NewSM() {
 	sm := fsm.NewFSM("idle",
 		fsm.Events{
 			{Name: "idle", Src: []string{"walk"}, Dst: "idle"},

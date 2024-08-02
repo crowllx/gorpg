@@ -53,7 +53,7 @@ func New() *Player {
 	body.SetVelocity(0, 0)
 	body.UserData = player
 	player.Body = body
-	player.NewStateMachine()
+	player.NewSM()
 	player.speed = 1.5
 	player.Body.SetAngle(UP)
 	player.Status = NewStatus(25, 10, func() {

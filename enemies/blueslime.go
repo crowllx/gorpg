@@ -36,7 +36,7 @@ func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	e.body.UserData = e
 	e.body.AddShape(e.shape)
 	e.aggroRadius = components.NewDetection(100, e.body, space, components.PLAYER_LAYER)
-	e.stateMachine = EnemyStateMachine()
+	e.stateMachine = e.EnemyStateMachine()
 	return e
 }
 
@@ -55,13 +55,13 @@ func load() *BlueSlime {
 	frames := components.LoadSpriteSheet(prefix+"attack.png", 64, 64)
 	e.Sprite.AddAnimation(frames, attack, .2, 64, 64, false)
 	frames = components.LoadSpriteSheet(prefix+"idle.png", 64, 64)
-	e.Sprite.AddAnimation(frames, idle, .2, 64, 64, false)
+	e.Sprite.AddAnimation(frames, idle, .2, 64, 64, true)
 	frames = components.LoadSpriteSheet(prefix+"walk.png", 64, 64)
-	e.Sprite.AddAnimation(frames, walk, .2, 64, 64, false)
+	e.Sprite.AddAnimation(frames, walk, .2, 64, 64, true)
 	frames = components.LoadSpriteSheet(prefix+"hurt.png", 64, 64)
-	e.Sprite.AddAnimation(frames, hurt, .2, 64, 64, false)
+	e.Sprite.AddAnimation(frames, hurt, .2, 64, 64, true)
 	frames = components.LoadSpriteSheet(prefix+"death.png", 64, 64)
-	e.Sprite.AddAnimation(frames, death, .2, 64, 64, false)
+	e.Sprite.AddAnimation(frames, death, .2, 64, 64, true)
 	e.Sprite.ChangeAnimation(idle, 0)
 	return e
 }
