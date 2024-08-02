@@ -19,9 +19,10 @@ type BlueSlime struct {
 	*BaseEnemy
 }
 
-// TODO: statemachine/ai logic & hurtboxes
 func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	e := load()
+
+	// body & hitbox
 	e.body = cp.NewKinematicBody()
 	e.body.SetPosition(pos)
 	e.shape = cp.NewCircle(e.body, 16, cp.Vector{X: 0, Y: 0})
@@ -32,10 +33,18 @@ func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	e.shape.SetFilter(filter)
 	e.shape.SetCollisionType(components.ENEMY_TYPE)
 	e.shape.UserData = e
+
+	// hurtboxes
+	hb := components.NewHurtBox(32, space, e.body, &cp.Vector{0, 0},
+		cp.NewShapeFilter(0, components.HIT_LAYER, components.PLAYER_LAYER))
+	e.hurtboxes = append(e.hurtboxes, hb)
+	// status & detection range
 	e.Status = components.NewStatus(10, 0, e.Death)
 	e.body.UserData = e
 	e.body.AddShape(e.shape)
 	e.aggroRadius = components.NewDetection(100, e.body, space, components.PLAYER_LAYER)
+
+	//state machine for enemy logic
 	e.stateMachine = e.EnemyStateMachine()
 	return e
 }

@@ -44,7 +44,7 @@ func (s *Scene) Draw(screen *ebiten.Image) {
 		}
 	})
 	if s.debug {
-		// debug(screen, s)
+		debug(screen, s)
 		s.debugCollisions(screen)
 	}
 }
@@ -70,6 +70,10 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 				var color colorm.ColorM
 				color.Scale(1, 1, 1, .2)
 				col = color.Apply(colornames.Green)
+			case *components.HurtBox:
+				var color colorm.ColorM
+				color.Scale(1, 1, 1, .2)
+				col = color.Apply(colornames.Blueviolet)
 			default:
 				var color colorm.ColorM
 				color.Scale(1, 1, 1, .2)
@@ -92,14 +96,19 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 }
 
 func debug(screen *ebiten.Image, s *Scene) {
-	// hp, _ := s.player.Status.Query("health")
-	// mp, _ := s.player.Status.Query("mana")
-	// var ehp, emp int
-	// if len(s.enemies) > 0 {
-	// 	ehp, _ = s.enemies[0].Query("health")
-	// 	emp, _ = s.enemies[0].Query("mana")
-	// }
+	hp, _ := s.player.Status.Query("health")
+	mp, _ := s.player.Status.Query("mana")
+	var ehp, emp int
+	if len(s.enemies) > 0 {
+		ehp, _ = s.enemies[0].Query("health")
+		emp, _ = s.enemies[0].Query("mana")
+	}
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-	  player vel: %v
-	  `, s.player.Body.Velocity()))
+	  player
+		hp: %d
+		mp: %d
+	  enemy
+		hp: %d
+		mp: %d
+	  `, hp, mp, ehp, emp))
 }

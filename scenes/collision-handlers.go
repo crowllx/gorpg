@@ -32,7 +32,7 @@ func SetupCollisionHandlers(space *cp.Space) {
 		case enemies.Enemy:
 			b.UserData.(enemies.Enemy).Modify("health", hurt.Value())
 		case *player.Player:
-			res, _ := b.UserData.(player.Player).Status.Modify("health", hurt.Value())
+			res, _ := b.UserData.(*player.Player).Status.Modify("health", hurt.Value())
 			fmt.Println(res)
 
 		default:

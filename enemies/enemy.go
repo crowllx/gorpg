@@ -6,7 +6,6 @@ import (
 	. "gorpg/components"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/jakecoffman/cp/v2"
 	"github.com/looplab/fsm"
 )
@@ -22,7 +21,7 @@ type Enemy interface {
 type BaseEnemy struct {
 	body         *cp.Body
 	shape        *cp.Shape
-	hurtboxes    *[]HurtBox
+	hurtboxes    []*HurtBox
 	Sprite       *AnimatedSprite
 	Status       *Status
 	aggroRadius  *Detection
@@ -32,6 +31,9 @@ type BaseEnemy struct {
 func (e *BaseEnemy) AddToSpace(space *cp.Space) {
 	space.AddBody(e.body)
 	space.AddShape(e.shape)
+	for _, hb := range e.hurtboxes {
+		space.AddShape(hb.Shape())
+	}
 }
 
 func (e *BaseEnemy) Draw(screen *ebiten.Image) {
@@ -40,9 +42,9 @@ func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 	opts.GeoM.Translate(pos.X-32, pos.Y-32)
 	screen.DrawImage(e.Sprite.CurrentImg.Draw(), &opts)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-		enemy state: %s
-		`, e.stateMachine.Current()))
+	// ebitenutil.DebugPrint(screen, fmt.Sprintf(`
+	// 	enemy state: %s
+	// 	`, e.stateMachine.Current()))
 }
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {

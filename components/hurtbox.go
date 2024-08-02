@@ -13,18 +13,20 @@ type HurtBox struct {
 	damage  int
 }
 
-func NewHurtBox(rad float64, space *cp.Space, body *cp.Body, offset *cp.Vector) *HurtBox {
+func NewHurtBox(rad float64, space *cp.Space, body *cp.Body, offset *cp.Vector, filter cp.ShapeFilter) *HurtBox {
 	obj := HurtBox{
-		shape: cp.NewCircle(body, 16, *offset),
+		shape: cp.NewCircle(body, rad, *offset),
 	}
 	space.AddShape(obj.shape)
-	filter := cp.NewShapeFilter(0, HIT_LAYER, ENEMY_LAYER)
 	obj.shape.SetFilter(filter)
 	obj.shape.SetCollisionType(HIT_TYPE)
 	obj.shape.UserData = &obj
 	obj.Enabled = false
 	obj.damage = 2
 	return &obj
+}
+func (hb *HurtBox) Shape() *cp.Shape {
+	return hb.shape
 }
 func (hb *HurtBox) Value() int {
 	return hb.damage

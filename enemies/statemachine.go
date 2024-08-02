@@ -38,11 +38,11 @@ func (e *BaseEnemy) enterState(event *fsm.Event) {
 
 func (p *BaseEnemy) enterAttack() {
 	p.Sprite.ChangeAnimation(attack, 0)
-	// p.hurtboxes[0].Enabled = true
+	p.hurtboxes[0].Enabled = true
 }
 
 func (p *BaseEnemy) attackEnd() {
 	p.Sprite.ChangeAnimation(walk, 0)
-	// p.hurtboxes[0].Enabled = false
-	// p.hurtboxes[0].Reset()
+	p.hurtboxes[0].Enabled = false
+	p.hurtboxes[0].Reset()
 }
