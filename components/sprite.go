@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/yohamta/ganim8/v2"
 )
 
 type Drawable interface {
@@ -26,41 +27,53 @@ func (s *Sprite2D) Draw(screen *ebiten.Image) *ebiten.Image {
 
 // animated 2d sprite
 type AnimatedSprite struct {
-	animations [][]*Animation
-	CurrentImg *Animation
-	Current    int
+	animations  map[string]*ganim8.Animation
+	CurrentAnim *ganim8.Animation
+	Current     string
 	// Cardinal   int
 	// X, Y       float64
 }
 
-func NewAS(anims [][]*Animation) *AnimatedSprite {
+func NewAS(key string, anim *ganim8.Animation) *AnimatedSprite {
+	animMap := make(map[string]*ganim8.Animation)
+	animMap[key] = anim
 	return &AnimatedSprite{
-		animations: anims,
+		animations:  animMap,
+		CurrentAnim: animMap[key],
+		Current:     key,
 	}
 }
-func (as *AnimatedSprite) ChangeAnimation(anim int, cardinal int) {
-	as.Current = anim
-	as.CurrentImg = as.animations[anim][cardinal]
+
+func (as *AnimatedSprite) AddAnimation(key string, anim *ganim8.Animation) {
+	// probably needs handling of more cases. ie check if animation exists already
+	as.animations[key] = anim
 }
 
-func (as *AnimatedSprite) AddAnimation(spritesheet *ebiten.Image, anim int, speed float64, w, h int, loop bool) {
-	as.animations[anim] = append(as.animations[anim], &Animation{
-		Frames:         spritesheet,
-		Index:          0,
-		Advance:        0,
-		AnimationSpeed: speed,
-		w:              w,
-		h:              h,
-		FrameCount:     spritesheet.Bounds().Dx() / w,
-		loop:           loop,
-		finished:       false,
-	})
+func (as *AnimatedSprite) ChangeAnimation(key string) {
+	as.CurrentAnim.PauseAtStart()
+	as.Current = key
+	as.CurrentAnim = as.animations[key]
+	as.CurrentAnim.Resume()
 }
 
-func (as *AnimatedSprite) CurrentAnimation(cardinal int) *Animation {
-	a := as.animations[as.Current][cardinal]
-	return a
-}
+// func (as *AnimatedSprite) AddAnimation(spritesheet *ebiten.Image, anim int, speed float64, w, h int, loop bool) {
+// 	as.animations[anim] = append(as.animations[anim], &Animation{
+// 		Frames:         spritesheet,
+// 		Index:          0,
+// 		Advance:        0,
+// 		AnimationSpeed: speed,
+// 		w:              w,
+// 		h:              h,
+// 		FrameCount:     spritesheet.Bounds().Dx() / w,
+// 		loop:           loop,
+// 		finished:       false,
+// 	})
+// }
+
+// func (as *AnimatedSprite) CurrentAnimation(cardinal int) *Animation {
+// 	a := as.animations[as.Current][cardinal]
+// 	return a
+// }
 
 // helper methods for working with sprites
 func LoadSpriteSheet(path string, w, h int) *ebiten.Image {

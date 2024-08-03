@@ -22,12 +22,11 @@ func (enemy *BaseEnemy) EnemyStateMachine() *fsm.FSM {
 }
 
 func (e *BaseEnemy) enterState(event *fsm.Event) {
-	e.Sprite.CurrentAnimation(0).Reset()
 	switch event.Event {
 	case "idle":
-		e.Sprite.ChangeAnimation(idle, 0)
+		e.Sprite.ChangeAnimation("idle")
 	case "chase":
-		e.Sprite.ChangeAnimation(walk, 0)
+		e.Sprite.ChangeAnimation("idle")
 	case "attack":
 		e.enterAttack()
 	case "attack-end":
@@ -37,12 +36,12 @@ func (e *BaseEnemy) enterState(event *fsm.Event) {
 }
 
 func (p *BaseEnemy) enterAttack() {
-	p.Sprite.ChangeAnimation(attack, 0)
+	p.Sprite.ChangeAnimation("attack")
 	p.hurtboxes[0].Enabled = true
 }
 
 func (p *BaseEnemy) attackEnd() {
-	p.Sprite.ChangeAnimation(walk, 0)
+	p.Sprite.ChangeAnimation("walk")
 	p.hurtboxes[0].Enabled = false
 	p.hurtboxes[0].Reset()
 }

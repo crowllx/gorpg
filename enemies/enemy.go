@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/jakecoffman/cp/v2"
 	"github.com/looplab/fsm"
+	"github.com/yohamta/ganim8/v2"
 )
 
 type Enemy interface {
@@ -37,14 +38,9 @@ func (e *BaseEnemy) AddToSpace(space *cp.Space) {
 }
 
 func (e *BaseEnemy) Draw(screen *ebiten.Image) {
-	opts := ebiten.DrawImageOptions{}
 	pos := e.body.Position()
-	opts.GeoM.Translate(pos.X-32, pos.Y-32)
-	screen.DrawImage(e.Sprite.CurrentImg.Draw(), &opts)
-
-	// ebitenutil.DebugPrint(screen, fmt.Sprintf(`
-	// 	enemy state: %s
-	// 	`, e.stateMachine.Current()))
+	opts := ganim8.DrawOpts(pos.X-32, pos.Y-32)
+	e.Sprite.CurrentAnim.Draw(screen, opts)
 }
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {
@@ -99,8 +95,8 @@ func (e *BaseEnemy) Update() {
 		}
 		e.body.SetVelocityVector(velocity)
 	}
-	e.Sprite.CurrentImg.Update()
-	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentImg.Done() {
+	e.Sprite.CurrentAnim.Update()
+	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentAnim.IsEnd() {
 		e.stateMachine.Event(context.Background(), "attack-end")
 
 	}

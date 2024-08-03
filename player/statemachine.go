@@ -23,23 +23,23 @@ func (p *Player) NewSM() {
 }
 
 func (p *Player) enterIdle() {
-	p.sprite.ChangeAnimation(IDLE, p.cardinal)
+	p.sprite.ChangeAnimation("idle")
 }
 
 func (p *Player) enterWalk() {
-	p.sprite.ChangeAnimation(WALK, p.cardinal)
+	p.sprite.ChangeAnimation("walk")
 }
 
 // TODO
 // start animation
 // create hurtbox and add to space
 func (p *Player) enterAttack() {
-	p.sprite.ChangeAnimation(ATTACK, p.cardinal)
+	p.switchAnim("attack")
 	p.hurtboxes[0].Enabled = true
 }
 
 func (p *Player) attackEnd() {
-	p.sprite.ChangeAnimation(IDLE, p.cardinal)
+	p.switchAnim("idle")
 	p.hurtboxes[0].Enabled = false
 	p.hurtboxes[0].Reset()
 }
