@@ -50,7 +50,6 @@ func (as *AnimatedSprite) AddAnimation(key string, anim *ganim8.Animation) {
 }
 
 func (as *AnimatedSprite) ChangeAnimation(key string) {
-	as.CurrentAnim.PauseAtStart()
 	as.Current = key
 	as.CurrentAnim = as.animations[key]
 	as.CurrentAnim.Resume()

@@ -26,7 +26,7 @@ func load() *Player {
 	// back
 	img := LoadSpriteSheet(prefix+"back-animations/spr_player_back_attack.png", 64, 64)
 	anim := loadImg(img, frameW, frameH)
-	anim.SetOnLoop(ganim8.PauseAtEnd)
+	anim.SetOnLoop(ganim8.PauseAtStart)
 	sprite := NewAS("back-attack", anim)
 
 	img = LoadSpriteSheet(prefix+"back-animations/spr_player_back_hit.png", 64, 64)
@@ -43,6 +43,7 @@ func load() *Player {
 	//right
 	img = LoadSpriteSheet(prefix+"side-animations/spr_player_right_attack.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)
+	anim.SetOnLoop(ganim8.PauseAtStart)
 	sprite.AddAnimation("right-attack", anim)
 	img = LoadSpriteSheet(prefix+"side-animations/spr_player_right_hit.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)
@@ -55,6 +56,7 @@ func load() *Player {
 	sprite.AddAnimation("right-walk", anim)
 	img = LoadSpriteSheet(prefix+"front-animations/spr_player_front_attack.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)
+	anim.SetOnLoop(ganim8.PauseAtStart)
 	sprite.AddAnimation("front-attack", anim)
 	img = LoadSpriteSheet(prefix+"front-animations/spr_player_front_hit.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)
@@ -67,6 +69,7 @@ func load() *Player {
 	sprite.AddAnimation("front-walk", anim)
 	img = LoadSpriteSheet(prefix+"side-animations/spr_player_left_attack.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)
+	anim.SetOnLoop(ganim8.PauseAtStart)
 	sprite.AddAnimation("left-attack", anim)
 	img = LoadSpriteSheet(prefix+"side-animations/spr_player_left_hit.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)

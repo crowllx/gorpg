@@ -141,6 +141,7 @@ func (p *Player) Update() {
 	if dir != zero && (p.stateMachine.Can("walk") || p.stateMachine.Current() == "walk") {
 		p.Body.SetAngle(angle)
 		p.stateMachine.Event(context.Background(), "walk")
+		p.switchAnim("walk")
 	} else {
 		p.stateMachine.Event(context.Background(), "idle")
 	}
@@ -176,7 +177,7 @@ func (p *Player) Update() {
 
 	// what else needs to be done here? can i abstract this out to different module?
 	p.sprite.CurrentAnim.Update()
-	if p.stateMachine.Current() == "attack" && p.sprite.CurrentAnim.IsEnd() {
+	if p.stateMachine.Current() == "attack" && p.sprite.CurrentAnim.Status() == ganim8.Paused {
 		p.stateMachine.Event(context.Background(), "attack-end")
 	}
 }
