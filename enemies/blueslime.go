@@ -71,6 +71,7 @@ func load() *BlueSlime {
 
 	img := components.LoadSpriteSheet(prefix+"attack.png", 64, 64)
 	anim := loadImg(img, frameW, frameH)
+	anim.SetOnLoop(ganim8.PauseAtStart)
 	sprite := components.NewAS("attack", anim)
 	img = components.LoadSpriteSheet(prefix+"idle.png", 64, 64)
 	anim = loadImg(img, frameW, frameH)

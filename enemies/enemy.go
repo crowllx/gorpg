@@ -96,7 +96,7 @@ func (e *BaseEnemy) Update() {
 		e.body.SetVelocityVector(velocity)
 	}
 	e.Sprite.CurrentAnim.Update()
-	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentAnim.IsEnd() {
+	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentAnim.Status() == ganim8.Paused {
 		e.stateMachine.Event(context.Background(), "attack-end")
 
 	}
