@@ -3,8 +3,8 @@ package player
 import (
 	"context"
 	"fmt"
+	"gorpg/components"
 	. "gorpg/components"
-	"gorpg/utils"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -156,21 +156,7 @@ func (p *Player) Update() {
 	dy := float64(dir.Y) * p.speed
 
 	// check collisions given new velocity
-	p.shape.Space().ShapeQuery(p.shape, func(s *cp.Shape, cps *cp.ContactPointSet) {
-		switch s.UserData.(type) {
-		case utils.Collidable:
-			fmt.Printf("%T\n", s.UserData)
-			normal := cps.Normal
-			colX, colY := TerrainCheck(cp.Vector{dx, dy}, normal, p.Body)
-			if colX {
-				dx = 0
-			}
-			if colY {
-				dy = 0
-			}
-		default:
-		}
-	})
+	dx, dy = components.Move(p.shape, dx, dy)
 
 	// finally update velocity considering user input and collisions
 	p.Body.SetVelocity(dx, dy)

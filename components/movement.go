@@ -1,6 +1,11 @@
 package components
 
-import "github.com/jakecoffman/cp/v2"
+import (
+	"fmt"
+	"gorpg/utils"
+
+	"github.com/jakecoffman/cp/v2"
+)
 
 func TerrainCheck(vel cp.Vector, normal cp.Vector, body *cp.Body) (bool, bool) {
 	collisionX := false
@@ -13,4 +18,23 @@ func TerrainCheck(vel cp.Vector, normal cp.Vector, body *cp.Body) (bool, bool) {
 
 	}
 	return collisionX, collisionY
+}
+
+func Move(shape *cp.Shape, dx, dy float64) (float64, float64) {
+	shape.Space().ShapeQuery(shape, func(s *cp.Shape, cps *cp.ContactPointSet) {
+		switch s.UserData.(type) {
+		case utils.Collidable:
+			fmt.Printf("%T\n", s.UserData)
+			normal := cps.Normal
+			colX, colY := TerrainCheck(cp.Vector{dx, dy}, normal, shape.Body())
+			if colX {
+				dx = 0
+			}
+			if colY {
+				dy = 0
+			}
+		default:
+		}
+	})
+	return dx, dy
 }
