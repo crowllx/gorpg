@@ -3,6 +3,7 @@ package enemies
 import (
 	"context"
 	"fmt"
+	"gorpg/components"
 	. "gorpg/components"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -93,7 +94,10 @@ func (e *BaseEnemy) Update() {
 		if e.stateMachine.Current() != state {
 			e.stateMachine.Event(context.Background(), state)
 		}
-		e.body.SetVelocityVector(velocity)
+
+		// collision check/movement logic logic
+		dx, dy := components.Move(e.shape, velocity.X, velocity.Y)
+		e.body.SetVelocity(dx, dy)
 	}
 	e.Sprite.CurrentAnim.Update()
 	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentAnim.Status() == ganim8.Paused {
