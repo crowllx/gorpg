@@ -30,6 +30,9 @@ type BaseEnemy struct {
 	stateMachine *fsm.FSM
 }
 
+func _onHealthChanged() {
+	fmt.Println("enemy: what happened??")
+}
 func (e *BaseEnemy) AddToSpace(space *cp.Space) {
 	space.AddBody(e.body)
 	space.AddShape(e.shape)
@@ -58,6 +61,8 @@ func (e *BaseEnemy) Death() {
 	e = nil
 
 }
+
+// TODO get rid of these
 func (e *BaseEnemy) Query(q string) (int, error) {
 	return e.Status.Query(q)
 }
@@ -66,39 +71,34 @@ func (e *BaseEnemy) Modify(q string, v int) {
 	e.Status.Modify(q, v)
 }
 
+func (e *BaseEnemy) aggro(pqi *cp.PointQueryInfo) {
+	var velocity cp.Vector
+	var state string
+	fmt.Println("aggroed")
+	if pqi.Shape != nil && e.stateMachine.Current() != "attack" {
+		if pqi.Distance < 6 {
+			velocity = cp.Vector{0, 0}
+			state = "attack"
+		} else {
+			//multiply by speed
+			velocity = pqi.Point.Sub(e.body.Position()).Normalize().Mult(1)
+			state = "chase"
+		}
+	} else {
+		velocity = cp.Vector{0, 0}
+		state = "idle"
+	}
+	if e.stateMachine.Current() != state {
+		e.stateMachine.Event(context.Background(), state)
+	}
+
+	dx, dy := components.Move(e.shape, velocity.X, velocity.Y)
+	e.body.SetVelocity(dx, dy)
+}
+
 // TODO: what is needed to update an 'enemy'?
 func (e *BaseEnemy) Update() {
-	var velocity cp.Vector
-	// enemy detection & chase
-	if e.aggroRadius.Enabled {
-		info := e.shape.Space().PointQueryNearest(
-			e.body.Position(),
-			e.aggroRadius.Radius,
-			e.aggroRadius.Shape.Filter,
-		)
-
-		//TODO write this ina way that doesn't require nesting
-		var state string
-		if info.Shape != nil && e.stateMachine.Current() != "attack" {
-			if info.Distance < 8 {
-				velocity = cp.Vector{0, 0}
-				state = "attack"
-			} else {
-				velocity = info.Point.Sub(e.body.Position()).Normalize().Mult(1)
-				state = "chase"
-			}
-		} else {
-			velocity = cp.Vector{0, 0}
-			state = "idle"
-		}
-		if e.stateMachine.Current() != state {
-			e.stateMachine.Event(context.Background(), state)
-		}
-
-		// collision check/movement logic logic
-		dx, dy := components.Move(e.shape, velocity.X, velocity.Y)
-		e.body.SetVelocity(dx, dy)
-	}
+	e.aggroRadius.Update()
 	e.Sprite.CurrentAnim.Update()
 	if e.stateMachine.Current() == "attack" && e.Sprite.CurrentAnim.Status() == ganim8.Paused {
 		e.stateMachine.Event(context.Background(), "attack-end")

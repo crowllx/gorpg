@@ -20,6 +20,8 @@ func TerrainCheck(vel cp.Vector, normal cp.Vector, body *cp.Body) (bool, bool) {
 	return collisionX, collisionY
 }
 
+// shape to be moved, x and y values to move the object this update (velocity)
+// returns the x and y values that the object is able to move
 func Move(shape *cp.Shape, dx, dy float64) (float64, float64) {
 	shape.Space().ShapeQuery(shape, func(s *cp.Shape, cps *cp.ContactPointSet) {
 		switch s.UserData.(type) {

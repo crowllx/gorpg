@@ -59,8 +59,11 @@ func New() *Player {
 	player.Body.SetAngle(UP)
 	player.Status = NewStatus(25, 10, func() {
 		fmt.Println("I'm immune to death")
-	})
+	}, player._onHealthChanged)
 	return player
+}
+func (p *Player) _onHealthChanged() {
+	fmt.Println("what happened?")
 }
 func (p *Player) Sprite() *AnimatedSprite {
 	return p.sprite
@@ -148,22 +151,18 @@ func (p *Player) Update() {
 	if p.input.ActionIsJustPressed(ActionAttack) {
 		p.stateMachine.Event(context.Background(), "attack")
 	}
-	// if p.stateMachine.Is("attack") && V {
-	// 	dir.X, dir.Y = 0, 0
-	// }
-	// new velocity based on user input
+
 	dx := float64(dir.X) * p.speed
 	dy := float64(dir.Y) * p.speed
 
 	// check collisions given new velocity
 	dx, dy = components.Move(p.shape, dx, dy)
-
-	// finally update velocity considering user input and collisions
 	p.Body.SetVelocity(dx, dy)
 
 	// what else needs to be done here? can i abstract this out to different module?
 	p.sprite.CurrentAnim.Update()
-	if p.stateMachine.Current() == "attack" && p.sprite.CurrentAnim.Status() == ganim8.Paused {
+	if p.stateMachine.Current() == "attack" &&
+		p.sprite.CurrentAnim.Status() == ganim8.Paused {
 		p.stateMachine.Event(context.Background(), "attack-end")
 	}
 }

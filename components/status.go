@@ -5,17 +5,23 @@ import (
 	"fmt"
 )
 
+type IStatus interface {
+	_onHpChanged()
+	_onDeath()
+}
 type Status struct {
-	health int
-	mana   int
-	death  func()
+	health       int
+	mana         int
+	_onHpChanged func()
+	_onDeath     func()
 }
 
-func NewStatus(hp, mp int, death func()) *Status {
+func NewStatus(hp, mp int, death func(), onHpChanged func()) *Status {
 	return &Status{
-		health: hp,
-		mana:   mp,
-		death:  death,
+		health:       hp,
+		mana:         mp,
+		_onDeath:     death,
+		_onHpChanged: onHpChanged,
 	}
 }
 func (s *Status) Query(q string) (int, error) {
@@ -34,6 +40,9 @@ func (s *Status) Modify(query string, value int) (int, error) {
 	switch query {
 	case "health":
 		s.health -= value
+		if s._onHpChanged != nil {
+			s._onHpChanged()
+		}
 		return s.health, nil
 	case "mana":
 		if value > s.mana {

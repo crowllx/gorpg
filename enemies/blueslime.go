@@ -42,10 +42,10 @@ func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 		cp.NewShapeFilter(0, components.HIT_LAYER, components.PLAYER_LAYER))
 	e.hurtboxes = append(e.hurtboxes, hb)
 	// status & detection range
-	e.Status = components.NewStatus(10, 0, e.Death)
+	e.Status = components.NewStatus(10, 0, e.Death, _onHealthChanged)
 	e.body.UserData = e
 	e.body.AddShape(e.shape)
-	e.aggroRadius = components.NewDetection(100, e.body, space, components.PLAYER_LAYER)
+	e.aggroRadius = components.NewDetection(100, e.body, space, components.PLAYER_LAYER, e.aggro)
 
 	//state machine for enemy logic
 	e.stateMachine = e.EnemyStateMachine()
