@@ -49,7 +49,6 @@ func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {
 		e.body.EachShape(func(s *cp.Shape) {
-			fmt.Printf("%T\n", s.UserData)
 			space.RemoveShape(s)
 		})
 		space.RemoveBody(e.body)
@@ -74,7 +73,6 @@ func (e *BaseEnemy) Modify(q string, v int) {
 func (e *BaseEnemy) aggro(pqi *cp.PointQueryInfo) {
 	var velocity cp.Vector
 	var state string
-	fmt.Println("aggroed")
 	if pqi.Shape != nil && e.stateMachine.Current() != "attack" {
 		if pqi.Distance < 6 {
 			velocity = cp.Vector{0, 0}

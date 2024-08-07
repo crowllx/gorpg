@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"gorpg/player"
 	"gorpg/scenes"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
+	"github.com/solarlune/ldtkgo"
 	"golang.org/x/image/colornames"
 )
 
@@ -17,20 +19,27 @@ type Game struct {
 	player      *player.Player
 	inputSystem input.System
 	scene       *scenes.Scene
+	project     *ldtkgo.Project
 	Height      float64
 	Width       float64
 }
 
 func NewGame() *Game {
 	gh, gw := 360.0, 640.0
-	g := &Game{player: player.New()}
+	g := &Game{}
 	g.inputSystem.Init(input.SystemConfig{
 		DevicesEnabled: input.AnyDevice,
 	})
+	g.project = scenes.LoadProject("gorpg.ldtk")
+	g.scene, g.player = scenes.LoadLevel(g.project.Levels[0])
+	fmt.Printf("%T %T\n", g.scene, g.player)
 	g.player.AddInputHandler(&g.inputSystem)
 	g.Height = gh
 	g.Width = gw
-	g.scene = (*scenes.Scene)(scenes.NewDebugScene(g.Width, g.Height, 16, 16, g.player))
+
+	for _, l := range g.project.Levels {
+		log.Printf("%v", l)
+	}
 	return g
 }
 func (g *Game) Update() error {

@@ -47,10 +47,10 @@ type Player struct {
 	area         *BasicArea
 }
 
-func New() *Player {
+func New(x, y float64) *Player {
 	player := load()
 	body := cp.NewKinematicBody()
-	body.SetPosition(cp.Vector{X: 100, Y: 100})
+	body.SetPosition(cp.Vector{x, y})
 	body.SetVelocity(0, 0)
 	body.UserData = player
 	player.Body = body

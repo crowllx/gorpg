@@ -1,7 +1,7 @@
 package components
 
 import (
-	"fmt"
+	_ "fmt"
 
 	"github.com/jakecoffman/cp/v2"
 )
@@ -30,9 +30,7 @@ func NewDetection(d float64, body *cp.Body, space *cp.Space, collisionFilter uin
 }
 
 func (area *Detection) Update() {
-	fmt.Println("detection updating")
 	if area.Enabled {
-		fmt.Printf("%v\n%d\n", area.Shape.Body().Position(),area.Radius)
 		info := area.Shape.Space().PointQueryNearest(
 			area.Shape.Body().Position(),
 			area.Radius,

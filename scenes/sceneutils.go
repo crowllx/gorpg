@@ -1,10 +1,12 @@
 package scenes
 
 import (
+	"embed"
 	"fmt"
 	"gorpg/components"
 	"gorpg/enemies"
 	"gorpg/player"
+	"image"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -12,6 +14,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/jakecoffman/cp/v2"
+	"github.com/solarlune/ldtkgo"
 	"golang.org/x/image/colornames"
 )
 
@@ -24,6 +27,8 @@ type Updateable interface {
 type Scene struct {
 	player  *player.Player
 	space   *cp.Space
+	tileSet *ebiten.Image
+	tiles   []*ldtkgo.Tile
 	enemies []enemies.Enemy
 	debug   bool
 }
@@ -36,6 +41,13 @@ func (s *Scene) Draw(screen *ebiten.Image) {
 	// 	default:
 	// 	}
 	// }
+	for _, t := range s.tiles {
+		x, y := t.Src[0], t.Src[1]
+		sub := s.tileSet.SubImage(image.Rect(x, y, x+16, y+16))
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Translate(float64(t.Position[0]), float64(t.Position[1]))
+		screen.DrawImage(sub.(*ebiten.Image), opts)
+	}
 	s.space.EachBody(func(body *cp.Body) {
 		switch body.UserData.(type) {
 		case Drawable:
@@ -59,6 +71,8 @@ func (s *Scene) Update() {
 		}
 	})
 }
+
+var assets embed.FS
 
 func (s *Scene) debugCollisions(screen *ebiten.Image) {
 	s.space.EachShape(func(shape *cp.Shape) {
