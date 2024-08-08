@@ -13,7 +13,7 @@ import (
 )
 
 type Enemy interface {
-	Draw(*ebiten.Image)
+	Draw(*ebiten.Image, float64, float64)
 	AddToSpace(*cp.Space)
 	Update()
 	Death()
@@ -41,8 +41,10 @@ func (e *BaseEnemy) AddToSpace(space *cp.Space) {
 	}
 }
 
-func (e *BaseEnemy) Draw(screen *ebiten.Image) {
+func (e *BaseEnemy) Draw(screen *ebiten.Image, camX, camY float64) {
 	pos := e.body.Position()
+	pos.X += camX
+	pos.Y += camY
 	opts := ganim8.DrawOpts(pos.X-32, pos.Y-32)
 	e.Sprite.CurrentAnim.Draw(screen, opts)
 }

@@ -20,6 +20,7 @@ type Game struct {
 	inputSystem input.System
 	scene       *scenes.Scene
 	project     *ldtkgo.Project
+	camera      *Camera
 	Height      float64
 	Width       float64
 }
@@ -32,6 +33,7 @@ func NewGame() *Game {
 	})
 	g.project = scenes.LoadProject("gorpg.ldtk")
 	g.scene, g.player = scenes.LoadLevel(g.project.Levels[0])
+	g.camera = NewCamera(0, 0, g.player)
 	fmt.Printf("%T %T\n", g.scene, g.player)
 	g.player.AddInputHandler(&g.inputSystem)
 	g.Height = gh
@@ -45,12 +47,13 @@ func NewGame() *Game {
 func (g *Game) Update() error {
 	g.inputSystem.Update()
 	g.scene.Update()
+	g.camera.Follow(g.Width, g.Height)
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colornames.Darkslateblue)
-	g.scene.Draw(screen)
+	g.scene.Draw(screen, g.camera.X, g.camera.Y)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHieght int) (screenWdith, screenHeight int) {

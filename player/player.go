@@ -167,8 +167,12 @@ func (p *Player) Update() {
 	}
 }
 
-func (p *Player) Draw(screen *ebiten.Image) {
+func (p *Player) Draw(screen *ebiten.Image, camX, camY float64) {
 	pos := p.Body.Position()
 	opts := ganim8.DrawOpts(pos.X-32, pos.Y-32)
+	opts.X += camX
+	opts.Y += camY
+	// opts.OriginX = camX
+	// opts.OriginY = camY
 	p.sprite.CurrentAnim.Draw(screen, opts)
 }

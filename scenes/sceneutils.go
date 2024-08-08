@@ -19,7 +19,7 @@ import (
 )
 
 type Drawable interface {
-	Draw(*ebiten.Image)
+	Draw(*ebiten.Image, float64, float64)
 }
 type Updateable interface {
 	Update()
@@ -33,31 +33,25 @@ type Scene struct {
 	debug   bool
 }
 
-func (s *Scene) Draw(screen *ebiten.Image) {
-	// for _, o := range s.space.Objects() {
-	// 	switch o.Data.(type) {
-	// 	case Drawable:
-	// 		o.Data.(Drawable).Draw(screen)
-	// 	default:
-	// 	}
-	// }
+func (s *Scene) Draw(screen *ebiten.Image, camX, camY float64) {
 	for _, t := range s.tiles {
 		x, y := t.Src[0], t.Src[1]
 		sub := s.tileSet.SubImage(image.Rect(x, y, x+16, y+16))
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(float64(t.Position[0]), float64(t.Position[1]))
+		opts.GeoM.Translate(camX, camY)
 		screen.DrawImage(sub.(*ebiten.Image), opts)
 	}
 	s.space.EachBody(func(body *cp.Body) {
 		switch body.UserData.(type) {
 		case Drawable:
-			body.UserData.(Drawable).Draw(screen)
+			body.UserData.(Drawable).Draw(screen, camX, camY)
 		default:
 		}
 	})
 	if s.debug {
 		debug(screen, s)
-		s.debugCollisions(screen)
+		s.debugCollisions(screen, camX, camY)
 	}
 }
 
@@ -74,7 +68,7 @@ func (s *Scene) Update() {
 
 var assets embed.FS
 
-func (s *Scene) debugCollisions(screen *ebiten.Image) {
+func (s *Scene) debugCollisions(screen *ebiten.Image, camX, camY float64) {
 	s.space.EachShape(func(shape *cp.Shape) {
 		switch shape.Class.(type) {
 		case *cp.Circle:
@@ -96,6 +90,8 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 			}
 			// fmt.Printf("shape center %v\n", shape.BB().Center())
 			pos := shape.BB().Center()
+			pos.X += camX
+			pos.Y += camY
 			rad := shape.BB().R - shape.BB().Center().X
 			vector.DrawFilledCircle(screen, float32(pos.X), float32(pos.Y), float32(rad), col, false)
 		case *cp.Segment:
@@ -103,6 +99,8 @@ func (s *Scene) debugCollisions(screen *ebiten.Image) {
 			color.Scale(1, 1, 1, .2)
 			v1 := shape.Class.(*cp.Segment).A()
 			v2 := shape.Class.(*cp.Segment).B()
+			v1.Add(cp.Vector{camX, camY})
+			v2.Add(cp.Vector{camX, camY})
 			vector.StrokeLine(screen, float32(v1.X), float32(v1.Y), float32(v2.X), float32(v2.Y), 4, color.Apply(colornames.Black), false)
 		default:
 		}
