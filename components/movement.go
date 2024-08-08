@@ -1,7 +1,7 @@
 package components
 
 import (
-	"fmt"
+	_ "fmt"
 	"gorpg/utils"
 
 	"github.com/jakecoffman/cp/v2"
@@ -26,7 +26,6 @@ func Move(shape *cp.Shape, dx, dy float64) (float64, float64) {
 	shape.Space().ShapeQuery(shape, func(s *cp.Shape, cps *cp.ContactPointSet) {
 		switch s.UserData.(type) {
 		case utils.Collidable:
-			fmt.Printf("%T\n", s.UserData)
 			normal := cps.Normal
 			colX, colY := TerrainCheck(cp.Vector{dx, dy}, normal, shape.Body())
 			if colX {
