@@ -5,7 +5,7 @@ import (
 	"gorpg/player"
 	"gorpg/scenes"
 	"log"
-
+    "gorpg/ui"
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
 	"github.com/solarlune/ldtkgo"
@@ -23,6 +23,7 @@ type Game struct {
 	camera      *Camera
 	Height      float64
 	Width       float64
+	ui          *ui.ProgressBar
 }
 
 func NewGame() *Game {
@@ -38,6 +39,7 @@ func NewGame() *Game {
 	g.player.AddInputHandler(&g.inputSystem)
 	g.Height = gh
 	g.Width = gw
+	g.ui = ui.NewProgressBar(150, 16, 25, colornames.Darkred)
 
 	for _, l := range g.project.Levels {
 		log.Printf("%v", l)
@@ -48,12 +50,15 @@ func (g *Game) Update() error {
 	g.inputSystem.Update()
 	g.scene.Update()
 	g.camera.Follow(g.Width, g.Height)
+	hp, _ := g.player.Status.Query("health")
+	g.ui.SetVal(float64(hp))
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colornames.Darkslateblue)
 	g.scene.Draw(screen, g.camera.X, g.camera.Y)
+	g.ui.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHieght int) (screenWdith, screenHeight int) {
