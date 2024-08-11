@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"gorpg/player"
 	"gorpg/scenes"
+	"gorpg/ui"
 	"log"
-    "gorpg/ui"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
 	"github.com/solarlune/ldtkgo"
+	"github.com/yohamta/furex/v2"
 	"golang.org/x/image/colornames"
 )
 
@@ -23,7 +25,7 @@ type Game struct {
 	camera      *Camera
 	Height      float64
 	Width       float64
-	ui          *ui.ProgressBar
+	ui          *furex.View
 }
 
 func NewGame() *Game {
@@ -39,7 +41,8 @@ func NewGame() *Game {
 	g.player.AddInputHandler(&g.inputSystem)
 	g.Height = gh
 	g.Width = gw
-	g.ui = ui.NewProgressBar(150, 16, 25, colornames.Darkred)
+	g.ui = ui.LoadUI(int(gw), int(gh))
+    // furex.Debug = true
 
 	for _, l := range g.project.Levels {
 		log.Printf("%v", l)
@@ -50,9 +53,15 @@ func (g *Game) Update() error {
 	g.inputSystem.Update()
 	g.scene.Update()
 	g.camera.Follow(g.Width, g.Height)
-	hp, _ := g.player.Status.Query("health")
-	g.ui.SetVal(float64(hp))
-	return nil
+	g.ui.Update()
+    // how can i move this into the code for ui/bar?
+    hpbar, _ := g.ui.GetByID("hp")
+    if hpbar != nil {
+        //temporarily max hp is 25
+        hp, _ := g.player.Status.Query("health")
+        hpbar.Handler.(*ui.Bar).Val = float64(hp) / 25
+    }
+    return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

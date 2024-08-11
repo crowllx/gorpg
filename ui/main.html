@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <style>
+        .game-ui {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: stretch;
+            align-content: stretch;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            align-content: center;
+            margin-top: 50px;
+            flex-grow: 1;
+        }
+
+        .player-status{
+            display: flex;
+            width: 180;
+            height: 25;
+            margin-bottom: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            bottom: 0;
+        }
+        .gauge {
+            width: 180px;
+            height: 18px;
+            margin-top: 2px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-ui">
+        <div class="container">
+            <div class="player-status">
+                <gauge class="gauge" id="hp" color="red"></gauge>
+                <gauge class="gauge" id="mana" color="blue"></gauge>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
