@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
@@ -31,8 +30,6 @@ func (p *Bar) Draw(screen *ebiten.Image, frame image.Rectangle, view *furex.View
 		fgImg.Fill(colornames.Gray)
 	}
 	opts := ebiten.DrawImageOptions{}
-	fmt.Printf("%v\n", frame.Max)
-	fmt.Printf("%v\n", frame.Min)
 	point := frame.Min
 	bgImg.DrawImage(fgImg, &opts)
 	opts.GeoM.Translate(float64(point.X), float64(point.Y))

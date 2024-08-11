@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"gorpg/audio"
 	"gorpg/player"
 	"gorpg/scenes"
 	"gorpg/ui"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	input "github.com/quasilyte/ebitengine-input"
 	"github.com/solarlune/ldtkgo"
 	"github.com/yohamta/furex/v2"
@@ -18,14 +20,16 @@ type World struct {
 	game *Game
 }
 type Game struct {
-	player      *player.Player
-	inputSystem input.System
-	scene       *scenes.Scene
-	project     *ldtkgo.Project
-	camera      *Camera
-	Height      float64
-	Width       float64
-	ui          *furex.View
+	player          *player.Player
+	inputSystem     input.System
+	scene           *scenes.Scene
+	project         *ldtkgo.Project
+	camera          *Camera
+	Height          float64
+	Width           float64
+	ui              *furex.View
+	audioContext    *audio.Context
+	audioController *sound.AudioController
 }
 
 func NewGame() *Game {
@@ -42,7 +46,13 @@ func NewGame() *Game {
 	g.Height = gh
 	g.Width = gw
 	g.ui = ui.LoadUI(int(gw), int(gh))
-    // furex.Debug = true
+	// furex.Debug = true
+
+	//sound
+	g.audioContext = audio.NewContext(sound.SampleRate)
+	g.audioController, _ = sound.NewController(g.audioContext)
+	g.audioController.PlaySFX("audio/music/Wav/Ambient 2.wav", true)
+    g.player.SFXController, _ = sound.NewController(g.audioContext)
 
 	for _, l := range g.project.Levels {
 		log.Printf("%v", l)
@@ -51,17 +61,18 @@ func NewGame() *Game {
 }
 func (g *Game) Update() error {
 	g.inputSystem.Update()
-	g.scene.Update()
 	g.camera.Follow(g.Width, g.Height)
 	g.ui.Update()
-    // how can i move this into the code for ui/bar?
-    hpbar, _ := g.ui.GetByID("hp")
-    if hpbar != nil {
-        //temporarily max hp is 25
-        hp, _ := g.player.Status.Query("health")
-        hpbar.Handler.(*ui.Bar).Val = float64(hp) / 25
-    }
-    return nil
+	g.audioController.Update()
+	g.scene.Update()
+	// how can i move this into the code for ui/bar?
+	hpbar, _ := g.ui.GetByID("hp")
+	if hpbar != nil {
+		//temporarily max hp is 25
+		hp, _ := g.player.Status.Query("health")
+		hpbar.Handler.(*ui.Bar).Val = float64(hp) / 25
+	}
+	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

@@ -2,7 +2,6 @@ package ui
 
 import (
 	_ "embed"
-	"fmt"
 	"image"
 	"image/color"
 
@@ -23,8 +22,6 @@ func (p *Panel) Draw(screen *ebiten.Image, frame image.Rectangle, view *furex.Vi
     img := ebiten.NewImage(frame.Dx(), frame.Dy())
     img.Fill(colornames.Darkcyan)
     opts := ebiten.DrawImageOptions{}
-    fmt.Printf("%v\n",frame.Max)
-    fmt.Printf("%v\n",frame.Min)
     point := frame.Min
     opts.GeoM.Translate(float64(point.X), float64(point.Y))
     screen.DrawImage(img, &opts)

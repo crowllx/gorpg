@@ -3,6 +3,7 @@ package player
 import (
 	"context"
 	"fmt"
+	sound "gorpg/audio"
 	"gorpg/components"
 	. "gorpg/components"
 	"math"
@@ -35,16 +36,17 @@ const (
 )
 
 type Player struct {
-	Body         *cp.Body
-	shape        *cp.Shape
-	sprite       *AnimatedSprite
-	input        *input.Handler
-	stateMachine *fsm.FSM
-	speed        float64
-	hurtboxes    []*HurtBox
-	Status       *Status
-	direction    int
-	area         *BasicArea
+	Body          *cp.Body
+	shape         *cp.Shape
+	sprite        *AnimatedSprite
+	input         *input.Handler
+	stateMachine  *fsm.FSM
+	speed         float64
+	hurtboxes     []*HurtBox
+	Status        *Status
+	direction     int
+	area          *BasicArea
+	SFXController *sound.AudioController
 }
 
 func New(x, y float64) *Player {
@@ -128,7 +130,7 @@ func (p *Player) enterState(e *fsm.Event) {
 	case "idle":
 		p.switchAnim("idle")
 	case "walk":
-		p.switchAnim("walk")
+		p.enterWalk()
 	case "attack":
 		p.enterAttack()
 	case "attack-end":
@@ -164,6 +166,11 @@ func (p *Player) Update() {
 	if p.stateMachine.Current() == "attack" &&
 		p.sprite.CurrentAnim.Status() == ganim8.Paused {
 		p.stateMachine.Event(context.Background(), "attack-end")
+	}
+	switch p.stateMachine.Current() {
+	case "walk":
+		p.SFXController.PlaySFX("audio/sfx/WAV Files/SFX/Footsteps/Dirt/Dirt Run 1.wav", false)
+	default:
 	}
 }
 

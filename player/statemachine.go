@@ -2,6 +2,7 @@ package player
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/looplab/fsm"
 )
@@ -27,7 +28,8 @@ func (p *Player) enterIdle() {
 }
 
 func (p *Player) enterWalk() {
-	p.sprite.ChangeAnimation("walk")
+	p.switchAnim("walk")
+    fmt.Printf("walking\n")
 }
 
 // TODO
