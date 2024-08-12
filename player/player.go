@@ -36,17 +36,17 @@ const (
 )
 
 type Player struct {
-	Body          *cp.Body
-	shape         *cp.Shape
-	sprite        *AnimatedSprite
-	input         *input.Handler
-	stateMachine  *fsm.FSM
-	speed         float64
-	hurtboxes     []*HurtBox
-	Status        *Status
-	direction     int
-	area          *BasicArea
-	SFXController *sound.AudioController
+	Body         *cp.Body
+	shape        *cp.Shape
+	sprite       *AnimatedSprite
+	input        *input.Handler
+	stateMachine *fsm.FSM
+	speed        float64
+	hurtboxes    []*HurtBox
+	Status       *Status
+	direction    int
+	area         *BasicArea
+	sfxEmitter   *sound.AudioEmitter
 }
 
 func New(x, y float64) *Player {
@@ -126,6 +126,10 @@ func (p *Player) switchAnim(key string) {
 }
 func (p *Player) enterState(e *fsm.Event) {
 	fmt.Println(e.Event)
+	select {
+	case smPipe <- 1:
+	default:
+	}
 	switch e.Event {
 	case "idle":
 		p.switchAnim("idle")
@@ -169,7 +173,6 @@ func (p *Player) Update() {
 	}
 	switch p.stateMachine.Current() {
 	case "walk":
-		p.SFXController.PlaySFX("audio/sfx/WAV Files/SFX/Footsteps/Dirt/Dirt Run 1.wav", false)
 	default:
 	}
 }

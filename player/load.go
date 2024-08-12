@@ -2,12 +2,17 @@ package player
 
 import (
 	"fmt"
+	sound "gorpg/audio"
 	. "gorpg/components"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/ganim8/v2"
 )
+
+// sfx paths
+const walkDirt = "audio/sfx/WAV Files/SFX/Footsteps/Dirt/Dirt Walk 1.wav"
+const basicAttack = "audio/sfx/WAV Files/SFX/Attacks/Sword Attacks Hits and Blocks/Sword Attack 1.wav"
 
 func loadImg(img *ebiten.Image, fw, fh int) *ganim8.Animation {
 	imgW := img.Bounds().Dx()
@@ -82,5 +87,11 @@ func load() *Player {
 	sprite.AddAnimation("left-walk", anim)
 	player := Player{sprite: sprite}
 	player.sprite.ChangeAnimation("left-idle")
+
+	// SFX
+	emitter := sound.NewEmitter()
+	emitter.NewPlayer(walkDirt, true)
+    emitter.NewPlayer(basicAttack, false)
+	player.sfxEmitter = emitter
 	return &player
 }

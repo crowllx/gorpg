@@ -1,5 +1,4 @@
 package main
-
 import (
 	"fmt"
 	"gorpg/audio"
@@ -20,16 +19,16 @@ type World struct {
 	game *Game
 }
 type Game struct {
-	player          *player.Player
-	inputSystem     input.System
-	scene           *scenes.Scene
-	project         *ldtkgo.Project
-	camera          *Camera
-	Height          float64
-	Width           float64
-	ui              *furex.View
-	audioContext    *audio.Context
-	audioController *sound.AudioController
+	player       *player.Player
+	inputSystem  input.System
+	scene        *scenes.Scene
+	project      *ldtkgo.Project
+	camera       *Camera
+	Height       float64
+	Width        float64
+	ui           *furex.View
+	audioContext *audio.Context
+	bgm          *sound.AudioEmitter
 }
 
 func NewGame() *Game {
@@ -49,10 +48,9 @@ func NewGame() *Game {
 	// furex.Debug = true
 
 	//sound
-	g.audioContext = audio.NewContext(sound.SampleRate)
-	g.audioController, _ = sound.NewController(g.audioContext)
-	g.audioController.PlaySFX("audio/music/Wav/Ambient 2.wav", true)
-    g.player.SFXController, _ = sound.NewController(g.audioContext)
+	g.bgm = sound.NewEmitter()
+    g.bgm.NewPlayer("audio/music/Wav/Ambient 2.wav", true)
+    g.bgm.Streams["audio/music/Wav/Ambient 2.wav"].Play()
 
 	for _, l := range g.project.Levels {
 		log.Printf("%v", l)
@@ -63,7 +61,6 @@ func (g *Game) Update() error {
 	g.inputSystem.Update()
 	g.camera.Follow(g.Width, g.Height)
 	g.ui.Update()
-	g.audioController.Update()
 	g.scene.Update()
 	// how can i move this into the code for ui/bar?
 	hpbar, _ := g.ui.GetByID("hp")

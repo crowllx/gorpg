@@ -7,6 +7,8 @@ import (
 	"github.com/looplab/fsm"
 )
 
+var smPipe = make(chan int)
+
 func (p *Player) NewSM() {
 	sm := fsm.NewFSM("idle",
 		fsm.Events{
@@ -29,6 +31,12 @@ func (p *Player) enterIdle() {
 
 func (p *Player) enterWalk() {
 	p.switchAnim("walk")
+    go func() {
+        p.sfxEmitter.Streams[walkDirt].Play()
+        <- smPipe
+        p.sfxEmitter.Streams[walkDirt].Pause()
+        p.sfxEmitter.Streams[walkDirt].Rewind()
+    } ()
     fmt.Printf("walking\n")
 }
 
@@ -38,6 +46,11 @@ func (p *Player) enterWalk() {
 func (p *Player) enterAttack() {
 	p.switchAnim("attack")
 	p.hurtboxes[0].Enabled = true
+    go func() {
+        p.sfxEmitter.Streams[basicAttack].Play()
+        <- smPipe
+        p.sfxEmitter.Streams[basicAttack].Rewind()
+    } ()
 }
 
 func (p *Player) attackEnd() {
