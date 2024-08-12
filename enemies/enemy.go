@@ -41,9 +41,6 @@ func _onHealthChanged() {
 func (e *BaseEnemy) AddToSpace(space *cp.Space) {
 	space.AddBody(e.body)
 	space.AddShape(e.shape)
-	for _, hb := range e.hurtboxes {
-		space.AddShape(hb.Shape())
-	}
 }
 func (e *BaseEnemy) DrawHealthBar() (*ebiten.Image, float64,float64) {
 	w := e.Sprite.CurrentAnim.W()
@@ -72,14 +69,12 @@ func (e *BaseEnemy) Draw(screen *ebiten.Image, camX, camY float64) {
 }
 func (e *BaseEnemy) Death() {
 	if space := e.shape.Space(); space != nil {
-		e.body.EachShape(func(s *cp.Shape) {
-			space.RemoveShape(s)
-		})
+        for _, hb := range e.hurtboxes {
+            space.RemoveShape(hb.Shape())
+        }
+        space.RemoveShape(e.aggroRadius.Shape)
+        space.RemoveShape(e.shape)
 		space.RemoveBody(e.body)
-		space.EachShape(func(s *cp.Shape) {
-			fmt.Printf("space shape %T\n", s.UserData)
-		})
-
 	}
 	e = nil
 
