@@ -2,6 +2,7 @@ package enemies
 
 import (
 	"fmt"
+	sound "gorpg/audio"
 	"gorpg/components"
 	"time"
 
@@ -21,7 +22,8 @@ const (
 type BlueSlime struct {
 	*BaseEnemy
 }
-
+const basicAttack = "audio/sfx/WAV Files/SFX/Spells/Ice Freeze 2.wav"
+const walkWater = "audio/sfx/WAV Files/SFX/Footsteps/Water/Water Walk 5.wav"
 func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	e := load()
 
@@ -40,7 +42,9 @@ func NewSlime(pos cp.Vector, space *cp.Space) *BlueSlime {
 	// hurtboxes
 	hb := components.NewHurtBox(32, space, e.body, &cp.Vector{0, 0},
 		cp.NewShapeFilter(0, components.HIT_LAYER, components.PLAYER_LAYER))
+    hb.AddSFX(basicAttack, false)
 	e.hurtboxes = append(e.hurtboxes, hb)
+
 	// status & detection range
 	e.Status = components.NewStatus(10, 0, e.Death, _onHealthChanged)
 	e.body.UserData = e
@@ -87,5 +91,8 @@ func load() *BlueSlime {
 	sprite.AddAnimation("death", anim)
 	sprite.ChangeAnimation("idle")
 	e.Sprite = sprite
+    e.sfx = sound.NewEmitter()
+    e.sfx.NewPlayer(walkWater, true)
+    e.smPipe = make(chan int)
 	return e
 }

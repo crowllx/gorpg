@@ -2,6 +2,7 @@ package enemies
 
 import (
 	"context"
+	"time"
 
 	"github.com/looplab/fsm"
 )
@@ -22,11 +23,15 @@ func (enemy *BaseEnemy) EnemyStateMachine() *fsm.FSM {
 }
 
 func (e *BaseEnemy) enterState(event *fsm.Event) {
+	select {
+	case e.smPipe <- 1:
+	default:
+	}
 	switch event.Event {
 	case "idle":
 		e.Sprite.ChangeAnimation("idle")
 	case "chase":
-		e.Sprite.ChangeAnimation("idle")
+		e.enterChase()
 	case "attack":
 		e.enterAttack()
 	case "attack-end":
@@ -34,14 +39,26 @@ func (e *BaseEnemy) enterState(event *fsm.Event) {
 	default:
 	}
 }
-
-func (p *BaseEnemy) enterAttack() {
-	p.Sprite.ChangeAnimation("attack")
-	p.hurtboxes[0].Enabled = true
+func (e *BaseEnemy) enterChase() {
+	e.Sprite.ChangeAnimation("walk")
+	e.sfx.Streams[walkWater].Play()
+	go func() {
+		<-e.smPipe
+		e.sfx.Streams[walkWater].Pause()
+		e.sfx.Streams[walkWater].Rewind()
+	}()
+}
+func (e *BaseEnemy) enterAttack() {
+	e.Sprite.ChangeAnimation("attack")
+	hitDelay := time.NewTimer(time.Millisecond * 1500)
+	go func() {
+		<-hitDelay.C
+		e.hurtboxes[0].Enabled = true
+	}()
 }
 
-func (p *BaseEnemy) attackEnd() {
-	p.Sprite.ChangeAnimation("walk")
-	p.hurtboxes[0].Enabled = false
-	p.hurtboxes[0].Reset()
+func (e *BaseEnemy) attackEnd() {
+	e.Sprite.ChangeAnimation("walk")
+	e.hurtboxes[0].Enabled = false
+	e.hurtboxes[0].Reset()
 }

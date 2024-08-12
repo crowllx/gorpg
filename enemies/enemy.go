@@ -3,6 +3,7 @@ package enemies
 import (
 	"context"
 	"fmt"
+	sound "gorpg/audio"
 	"gorpg/components"
 	. "gorpg/components"
 
@@ -18,7 +19,7 @@ type Enemy interface {
 	Update()
 	Death()
 	Query(string) (int, error)
-	Modify(string, int)
+	GetStatus() *components.Status
 }
 type BaseEnemy struct {
 	body         *cp.Body
@@ -28,6 +29,8 @@ type BaseEnemy struct {
 	Status       *Status
 	aggroRadius  *Detection
 	stateMachine *fsm.FSM
+	smPipe       chan int
+	sfx          *sound.AudioEmitter
 }
 
 func _onHealthChanged() {
@@ -62,14 +65,13 @@ func (e *BaseEnemy) Death() {
 	e = nil
 
 }
+func (e *BaseEnemy) GetStatus() *components.Status {
+	return e.Status
+}
 
 // TODO get rid of these
 func (e *BaseEnemy) Query(q string) (int, error) {
 	return e.Status.Query(q)
-}
-
-func (e *BaseEnemy) Modify(q string, v int) {
-	e.Status.Modify(q, v)
 }
 
 func (e *BaseEnemy) aggro(pqi *cp.PointQueryInfo) {

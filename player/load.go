@@ -13,6 +13,7 @@ import (
 // sfx paths
 const walkDirt = "audio/sfx/WAV Files/SFX/Footsteps/Dirt/Dirt Walk 1.wav"
 const basicAttack = "audio/sfx/WAV Files/SFX/Attacks/Sword Attacks Hits and Blocks/Sword Attack 1.wav"
+const basicAttackHit = "audio/sfx/WAV Files/SFX/Attacks/Sword Attacks Hits and Blocks/Sword Impact Hit 1.wav"
 
 func loadImg(img *ebiten.Image, fw, fh int) *ganim8.Animation {
 	imgW := img.Bounds().Dx()

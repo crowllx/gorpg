@@ -77,6 +77,7 @@ func (p *Player) AddInputHandler(s *input.System) {
 func (p *Player) AddSpace(space *cp.Space) {
 	hb := NewHurtBox(16, space, p.Body, &cp.Vector{X: 0, Y: -16},
 		cp.NewShapeFilter(0, HIT_LAYER, ENEMY_LAYER))
+    hb.AddSFX(basicAttackHit, false)
 	p.hurtboxes = append(p.hurtboxes, hb)
 	space.AddBody(p.Body)
 	shape := space.AddShape(cp.NewCircle(p.Body, 16, cp.Vector{X: 0, Y: 0}))
