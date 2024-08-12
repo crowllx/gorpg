@@ -44,6 +44,17 @@ func (s *Scene) Draw(screen *ebiten.Image, camX, camY float64) {
 	}
 	s.space.EachBody(func(body *cp.Body) {
 		switch body.UserData.(type) {
+		case enemies.Enemy:
+			ePos := body.Position()
+			distance := ePos.Distance(s.player.Body.Position())
+			if distance <= 40 {
+				e := body.UserData.(enemies.Enemy)
+				bar, x, y := e.DrawHealthBar()
+				opts := &ebiten.DrawImageOptions{}
+				opts.GeoM.Translate(x+camX, y+camY)
+				screen.DrawImage(bar, opts)
+			}
+			body.UserData.(enemies.Enemy).Draw(screen, camX, camY)
 		case Drawable:
 			body.UserData.(Drawable).Draw(screen, camX, camY)
 		default:
@@ -108,12 +119,12 @@ func (s *Scene) debugCollisions(screen *ebiten.Image, camX, camY float64) {
 }
 
 func debug(screen *ebiten.Image, s *Scene) {
-	hp, _ := s.player.Status.Query("health")
-	mp, _ := s.player.Status.Query("mana")
+	hp, _, _ := s.player.Status.Query("health")
+	mp, _, _ := s.player.Status.Query("mana")
 	var ehp, emp int
 	if len(s.enemies) > 0 {
-		ehp, _ = s.enemies[0].Query("health")
-		emp, _ = s.enemies[0].Query("mana")
+		ehp, _, _ = s.enemies[0].Query("health")
+		emp, _, _ = s.enemies[0].Query("mana")
 	}
 	ebitenutil.DebugPrint(screen, fmt.Sprintf(`
 	  player

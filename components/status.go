@@ -11,7 +11,9 @@ type IStatus interface {
 }
 type Status struct {
 	health       int
+	maxHealth    int
 	mana         int
+	maxMana      int
 	_onHpChanged func()
 	_onDeath     func()
 }
@@ -19,19 +21,21 @@ type Status struct {
 func NewStatus(hp, mp int, death func(), onHpChanged func()) *Status {
 	return &Status{
 		health:       hp,
+		maxHealth:    hp,
 		mana:         mp,
+		maxMana:      mp,
 		_onDeath:     death,
 		_onHpChanged: onHpChanged,
 	}
 }
-func (s *Status) Query(q string) (int, error) {
+func (s *Status) Query(q string) (int, int, error) {
 	switch q {
 	case "health":
-		return s.health, nil
+		return s.health, s.maxHealth, nil
 	case "mana":
-		return s.mana, nil
+		return s.mana, s.maxMana, nil
 	default:
-		return 0, errors.New(fmt.Sprintf("invalid query string: %s", q))
+		return 0, 0, errors.New(fmt.Sprintf("invalid query string: %s", q))
 	}
 }
 

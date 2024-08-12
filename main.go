@@ -66,8 +66,8 @@ func (g *Game) Update() error {
 	hpbar, _ := g.ui.GetByID("hp")
 	if hpbar != nil {
 		//temporarily max hp is 25
-		hp, _ := g.player.Status.Query("health")
-		hpbar.Handler.(*ui.Bar).Val = float64(hp) / 25
+		hp, maxHp, _ := g.player.Status.Query("health")
+		hpbar.Handler.(*ui.Bar).Val = float64(hp) / float64(maxHp)
 	}
 	return nil
 }

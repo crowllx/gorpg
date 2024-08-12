@@ -11,14 +11,16 @@ import (
 	"github.com/jakecoffman/cp/v2"
 	"github.com/looplab/fsm"
 	"github.com/yohamta/ganim8/v2"
+	"golang.org/x/image/colornames"
 )
 
 type Enemy interface {
 	Draw(*ebiten.Image, float64, float64)
+    DrawHealthBar() (*ebiten.Image,float64,float64)
 	AddToSpace(*cp.Space)
 	Update()
 	Death()
-	Query(string) (int, error)
+	Query(string) (int, int, error)
 	GetStatus() *components.Status
 }
 type BaseEnemy struct {
@@ -42,6 +44,23 @@ func (e *BaseEnemy) AddToSpace(space *cp.Space) {
 	for _, hb := range e.hurtboxes {
 		space.AddShape(hb.Shape())
 	}
+}
+func (e *BaseEnemy) DrawHealthBar() (*ebiten.Image, float64,float64) {
+	w := e.Sprite.CurrentAnim.W()
+	h := 5
+	hp, maxHp, _ := e.Status.Query("health")
+
+	x := e.body.Position().X - float64(w/2)
+	y := e.body.Position().Y - float64(w/2)
+	bar := ebiten.NewImage(w, h)
+	bar.Fill(colornames.Darkgray)
+    percentHp := float64(hp)/float64(maxHp)
+	fg := ebiten.NewImage(w,h)
+    fg.Fill(colornames.Darkred)
+    opts := &ebiten.DrawImageOptions{}
+    opts.GeoM.Scale(percentHp, 1)
+	bar.DrawImage(fg, opts)
+	return bar, x, y
 }
 
 func (e *BaseEnemy) Draw(screen *ebiten.Image, camX, camY float64) {
@@ -70,7 +89,7 @@ func (e *BaseEnemy) GetStatus() *components.Status {
 }
 
 // TODO get rid of these
-func (e *BaseEnemy) Query(q string) (int, error) {
+func (e *BaseEnemy) Query(q string) (int, int, error) {
 	return e.Status.Query(q)
 }
 
@@ -107,7 +126,7 @@ func (e *BaseEnemy) Update() {
 
 	}
 	// status queries
-	hp, _ := e.Status.Query("health")
+	hp, _, _ := e.Status.Query("health")
 	if hp <= 0 {
 		e.Death()
 	}
