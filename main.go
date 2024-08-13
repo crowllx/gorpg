@@ -1,4 +1,5 @@
 package main
+
 import (
 	"fmt"
 	"gorpg/audio"
@@ -44,13 +45,13 @@ func NewGame() *Game {
 	g.player.AddInputHandler(&g.inputSystem)
 	g.Height = gh
 	g.Width = gw
-	g.ui = ui.LoadUI(int(gw), int(gh))
+	g.ui = ui.LoadUI(int(gw), int(gh), g.player)
 	// furex.Debug = true
 
 	//sound
 	g.bgm = sound.NewEmitter()
-    g.bgm.NewPlayer("audio/music/Wav/Ambient 2.wav", true)
-    g.bgm.Streams["audio/music/Wav/Ambient 2.wav"].Play()
+	g.bgm.NewPlayer("audio/music/Wav/Ambient 2.wav", true)
+	g.bgm.Streams["audio/music/Wav/Ambient 2.wav"].Play()
 
 	for _, l := range g.project.Levels {
 		log.Printf("%v", l)
@@ -62,13 +63,8 @@ func (g *Game) Update() error {
 	g.camera.Follow(g.Width, g.Height)
 	g.ui.Update()
 	g.scene.Update()
-	// how can i move this into the code for ui/bar?
-	hpbar, _ := g.ui.GetByID("hp")
-	if hpbar != nil {
-		//temporarily max hp is 25
-		hp, maxHp, _ := g.player.Status.Query("health")
-		hpbar.Handler.(*ui.Bar).Val = float64(hp) / float64(maxHp)
-	}
+
+    ui.SetGameUIValues(g.ui, g.player)
 	return nil
 }
 
